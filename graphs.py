@@ -10,7 +10,7 @@ from matplotlib.widgets import Button
 noderad = 0.6
 textsize = 15
 velocityscale = 0.02
-loadfilename = "flownetwork"
+loadfilename = ""
 ##################################
 
 '''
@@ -36,21 +36,25 @@ ADDING EDGES:
 Click the first node, then the second node, then type a name for the edge (optional).
 If no other attributes are wanted, just press Enter/Return. Otherwise, see below
 Edges can have the following attributes:
-1. bend (b): amount of curvature (recommended range: -1 (left) to 1 (right))
-2. flow (f): amount of flow along the edge (recommended range: 0 to 5)
-3. directedness: whether to be directed/undirected (und) (default is directed)
+    1. weight (w): weight assigned to the edge (will be displayed on edge too)
+    2. bend (b): amount of curvature (recommended range: -1 (left) to 1 (right))
+    3. flow (f): amount of flow along the edge (recommended range: 0 to 5)
+    4. directedness: whether to be directed/undirected (und) (default is directed)
 To assign attributes, use commas to separate each attribute, like this:
->> e,b=0.5,f=1,und (this creates an edge with name "e", bend 0.5, flow 1, and undirected)
->> ,f=1 (this creates an edge with no label, bend 0, flow 1, and directed)
->> (nothing inputted: this creates a directed edge with no label, flow, nor bend)
+    >> b=0.5,f=1,und (this creates an edge with weight 0, bend 0.5, flow 1, and undirected)
+    >> w=1,f=1 (this creates an edge with weight 1, bend 0, flow 1, and directed)
+    >> (nothing inputted: this creates a directed edge with no label, flow, nor bend)
 then press Enter/Return (Note: (1) Do not use spaces! (2) The order of the attributes
-don't matter, but whatever comes before the first comma must be the name (can be empty))
+doesn't matter)
+
+DELETING OBJECTS (nodes or edges):
+Click the object, then type "del" then Enter/Return.
+
+HIGHLIGHTING OBJECTS:
+Click the object, then type "hl" then Enter/Return.
 
 TOGGLING FLOW:
 Click the Toggle Flow Button to toggle between showing/unshowing flow along edges.
-
-HIGHLIGHTING OBJECTS (nodes or edges):
-Click the object, then type "hl" then Enter/Return.
 
 SAVE GRAPH:
 Type a valid name (e.g. flownetwork), then click the Save Button.
@@ -133,11 +137,11 @@ class node:
         self.labelshape.remove()
 
 class edge:
-    def __init__(self,node1,node2,s='',bend = 0, arrow=True, flow=0):
-        self.shape, self.labelshape = arrow_(node1.coord, node2.coord, s, bend, arrow)
+    def __init__(self,node1,node2,weight="",bend = 0, arrow=True, flow=0):
+        self.shape, self.labelshape = arrow_(node1.coord, node2.coord, weight, bend, arrow)
         self.start = node1
         self.end = node2
-        self.label = s
+        self.weight = weight
         self.distance = ((node1.coord[0]-node2.coord[0])**2+(node1.coord[1]-node2.coord[1])**2)**0.5
         self.bend = bend
         self.arrow = arrow
@@ -169,7 +173,7 @@ class edge:
         self.flowdots.remove()
         self.labelshape.remove()
 
-def arrow_(p,q,s,bend,arrow):
+def arrow_(p,q,weight,bend,arrow):
     '''draws arrow'''
     x1, y1 = p
     x2, y2 = q
@@ -184,8 +188,9 @@ def arrow_(p,q,s,bend,arrow):
 
     disp = np.array([[0,1],[-1,0]]) @ np.array([[x2-x1],[y2-y1]]) * bend * 0.5
     x3, y3 = list((disp+np.array([[(x1+x2)/2],[(y1+y2)/2]])).flatten())
-    if s: ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=1,zorder=0) 
-    labelshape = ax.text(x3,y3,s=s,horizontalalignment='center',verticalalignment='center', size=textsize)
+    if weight is not "": ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=1,zorder=0) 
+    labelshape = ax.text(x3,y3,s=str(weight),
+                         horizontalalignment='center',verticalalignment='center', size=textsize)
 
     return shape, labelshape
 
@@ -211,18 +216,21 @@ def reshape_diagram():
 
 reshape_diagram()
 
+
 ############################
 # Button Related Functions #
 ############################
 
+
 '''Toggle Flow'''
 
 butt = Button(plt.axes([0, 0, 0.2, 0.05]), "\\textbf{Toggle Flow}", image=None, color='0.85', hovercolor='0.95')
-showflow = True
+showflow = False
 def toggleflow(_):
     global showflow
     showflow = not showflow
 butt.on_clicked(toggleflow)
+
 
 '''Next'''
 
@@ -244,6 +252,7 @@ def nextstep(x):
     clickqueue = []
 nextbutt.on_clicked(nextstep)
 
+
 '''Save'''
 
 savebutt = Button(plt.axes([0.2, 0, 0.1, 0.05]), "\\textbf{Save}", image=None, color='0.85', hovercolor='0.95')
@@ -257,7 +266,7 @@ def savegraph(x):
         for_json["nodes"].append((n.coord[0], n.coord[1], n.label))
     for _,es in edgeset.items():
         for e in es:
-            for_json["edges"].append((e.start.coord, e.end.coord, e.label, e.bend, e.arrow, e.flowvalue))
+            for_json["edges"].append((e.start.coord, e.end.coord, e.weight, e.bend, e.arrow, e.flowvalue))
     
     with open("saved_graphs/" + inputstatus + ".json", "w") as f:
         json.dump(for_json,f)
@@ -272,6 +281,7 @@ def loadgraph(jsonname):
         p, q = tuple(e[0]), tuple(e[1])
         edge(nodeset[p], nodeset[q], *e[2:])
     reshape_diagram()
+
 
 '''BFS'''
 
@@ -304,6 +314,7 @@ def activatebfs(x):
     nextstep(x)
 bfsbutt.on_clicked(activatebfs)
 
+
 '''DFS'''
 
 dfsbutt = Button(plt.axes([0.7, 0, 0.1, 0.05]), "\\textbf{DFS}", image=None, color='0.85', hovercolor='0.95')
@@ -326,9 +337,13 @@ def activatedfs(x):
     nextstep(x)
 dfsbutt.on_clicked(activatedfs)
 
+
+
+
 ##########################
 # Input and Click System #
 ##########################
+
 
 inputstatus = '' # Input space
 
@@ -375,7 +390,7 @@ def process_input():
             p,q = nodeset[clickqueue[0]], nodeset[clickqueue[1]]
             splitinput = inputstatus.split(",")
 
-            fv, bn, ar = 0, 0, True
+            fv, bn, ar, we = 0, 0, True, ""
             for prop in splitinput:
                 if "f=" in prop:
                     fv = float(prop[2:])
@@ -383,8 +398,10 @@ def process_input():
                     bn = float(prop[2:])
                 if prop=="und":
                     ar = False
+                if "w=" in prop:
+                    we = float(prop[2:])
 
-            edge(p,q, '$'+splitinput[0]+'$' if splitinput[0] else '', flow = fv, bend = bn, arrow=ar)
+            edge(p,q, weight = we, flow = fv, bend = bn, arrow=ar)
 
     clickqueue = []
 
