@@ -399,7 +399,11 @@ def process_input():
                 if prop=="und":
                     ar = False
                 if "w=" in prop:
-                    we = float(prop[2:])
+                    try:
+                        we = int(prop[2:])
+                    except:
+                        we = float(prop[2:])
+
 
             edge(p,q, weight = we, flow = fv, bend = bn, arrow=ar)
 
