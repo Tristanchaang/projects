@@ -11,7 +11,7 @@ noderad = 0.6 # 0.6
 textsize = 15 # 15
 margin = 2 # 2
 velocityscale = 0.02 # 0.01
-loadfilename = ""
+loadfilename = "dijks2"
 ##################################
 
 '''
@@ -336,20 +336,30 @@ bfsbutt.on_clicked(activatebfs)
 
 dfsbutt = Button(plt.axes([0.7, 0, 0.1, 0.05]), "\\textbf{DFS}", image=None, color='0.85', hovercolor='0.95')
 
-def dfs(graph, node, edge=None, visited=[]):
-    if node not in visited:
-        visited.append(node)
-        yield [(node,),(edge,)] if edge is not None else [(node,)]
-        for nb,e in graph[node]:
-            yield from dfs(graph,nb,e,visited)
-    
+def dfs(graph, source):
+    visited = {source}
+    stack = [(source,)]
+    yield [(source,)]
+    while stack:
+        ne = stack[-1]
+        if ne[0] not in visited:
+            yield [(k,) for k in ne]
+            visited.add(ne[0])
+        remove_from_stack = True
+        for next_node, par_edge in graph[ne[0]]:
+            if next_node not in visited:
+                stack.append((next_node,par_edge))
+                remove_from_stack = False
+                break
+        if remove_from_stack:
+            stack.pop()
+
 def activatedfs(x):
     global clickqueue, mission
     if len(clickqueue)==0:
         print("Pick a source node first!")
         return
-    s = nodeset[clickqueue[-1]]
-    mission = dfs(adjmat, s)
+    mission = dfs(adjmat, nodeset[clickqueue[-1]])
     clickqueue = []
     nextstep(x)
 dfsbutt.on_clicked(activatedfs)
