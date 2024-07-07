@@ -205,15 +205,17 @@ def points_on_line_(p,q,pos,dist,bend=0):
 
 def reshape_diagram():
     '''
-    reshapes the diagram dimensions
+    Reshapes the diagram dimensions according to existing node coordinates.
     '''
     ax.set(xlim= node.xrange, ylim= node.yrange, aspect=1, xticks=[], yticks=[])
 
 reshape_diagram()
 
-###############
+############################
+# Button Related Functions #
+############################
 
-'''Showflow'''
+'''Toggle Flow'''
 
 butt = Button(plt.axes([0, 0, 0.2, 0.05]), "\\textbf{Toggle Flow}", image=None, color='0.85', hovercolor='0.95')
 showflow = True
@@ -222,7 +224,7 @@ def toggleflow(_):
     showflow = not showflow
 butt.on_clicked(toggleflow)
 
-################
+'''Next'''
 
 nextbutt = Button(plt.axes([0.9, 0, 0.1, 0.05]), "\\textbf{Next}", image=None, color='0.85', hovercolor='0.95')
 mission = None
@@ -242,9 +244,7 @@ def nextstep(x):
     clickqueue = []
 nextbutt.on_clicked(nextstep)
 
-################
-
-'''Save Graph'''
+'''Save'''
 
 savebutt = Button(plt.axes([0.2, 0, 0.1, 0.05]), "\\textbf{Save}", image=None, color='0.85', hovercolor='0.95')
 
@@ -272,8 +272,6 @@ def loadgraph(jsonname):
         p, q = tuple(e[0]), tuple(e[1])
         edge(nodeset[p], nodeset[q], *e[2:])
     reshape_diagram()
-
-################
 
 '''BFS'''
 
@@ -306,8 +304,6 @@ def activatebfs(x):
     nextstep(x)
 bfsbutt.on_clicked(activatebfs)
 
-###################
-
 '''DFS'''
 
 dfsbutt = Button(plt.axes([0.7, 0, 0.1, 0.05]), "\\textbf{DFS}", image=None, color='0.85', hovercolor='0.95')
@@ -330,26 +326,13 @@ def activatedfs(x):
     nextstep(x)
 dfsbutt.on_clicked(activatedfs)
 
-###################
+##########################
+# Input and Click System #
+##########################
 
-def update(frame):
-    if showflow:
-        for _,edges in edgeset.items():
-            for edge in edges:
-                edge.flowdots.set_visible(True)
-                edge.dispflow(frame*velocityscale)
-    else:
-        for _,edges in edgeset.items():
-            for edge in edges:
-                edge.flowdots.set_visible(False)
+inputstatus = '' # Input space
 
-ani = anime.FuncAnimation(fig=fig, func=update, frames=1000, interval=30)
-
-###################
-
-inputstatus = ''
-
-clickqueue = []
+clickqueue = [] # Sequence of clicked coordinates
 
 def process_input():
     global clickqueue, nodeset, inputstatus, nodeset, edgeset, adjmat
@@ -434,6 +417,21 @@ def onkey(event):
     print('>>', inputstatus)
     reshape_diagram()
 fig.canvas.mpl_connect('key_press_event', onkey)
+
+
+def update(frame):
+    if showflow:
+        for _,edges in edgeset.items():
+            for edge in edges:
+                edge.flowdots.set_visible(True)
+                edge.dispflow(frame*velocityscale)
+    else:
+        for _,edges in edgeset.items():
+            for edge in edges:
+                edge.flowdots.set_visible(False)
+
+ani = anime.FuncAnimation(fig=fig, func=update, frames=1000, interval=30)
+
 
 if loadfilename: loadgraph(loadfilename)
 
