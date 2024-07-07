@@ -28,49 +28,52 @@ At any point of time, to erase the current input (e.g. after clicking
 the wrong keys), press Esc to cancel.
 
 ADDING NODES:
-Click anywhere on the figure. Type a name of the node (e.g. x) then Enter/Return.
-(This will plot a node at the nearest lattice point.)
-(Node name must be unique to the given coordinate.)
-(Use the \ key for _, e.g. d_2)
+- Click anywhere on the figure. Type a name of the node (e.g. x) then Enter/Return.
+** Note **
+    (1) This will plot a node at the nearest lattice point.
+    (2) Node name must be unique to the given coordinate.
+    (3) Use the \ key for _, e.g. for d_2
 
 ADDING EDGES:
-Click the first node, then the second node, then type a name for the edge (optional).
-If no other attributes are wanted, just press Enter/Return. Otherwise, see below
-Edges can have the following attributes:
+- Click the first node, then the second node, then type a name for the edge (optional).
+- If no other attributes are wanted, just press Enter/Return. Otherwise, see below
+- Edges can have the following attributes:
     1. weight (w): weight assigned to the edge (will be displayed on edge too)
     2. bend (b): amount of curvature (recommended range: -1 (left) to 1 (right))
     3. flow (f): amount of flow along the edge (recommended range: 0 to 5)
     4. directedness: whether to be directed (dir) / undirected (und)
                      (default is dir, unless changed via process described shortly below)
-To assign attributes, use commas to separate each attribute, like this:
+- To assign attributes, use commas to separate each attribute, like this:
     >> b=0.5,f=1,und (this creates an edge with weight 0, bend 0.5, flow 1, and undirected)
     >> w=1,f=1 (this creates an edge with weight 1, bend 0, flow 1, and directed by default)
     >> (nothing inputted: this creates a directed edge with no label, flow, nor bend)
-then press Enter/Return. 
-** Note: **
+  then press Enter/Return. 
+** Note **
     (1) Do not use spaces! 
     (2) The order of the attributes doesn't matter
     (3) To change the default directedness, type dir/und when the clickqueue is empty.
 
 DELETING OBJECTS (nodes or edges):
-Click the object, then Backspace. (OR: type "del" then Enter/Return.)
-** Note: ** If you delete a node, all edges attached to it will also be deleted.
+- Click the object, then Backspace. (OR: type "del" then Enter/Return.)
+** Note ** 
+    (1) If you delete a node, all edges attached to it will also be deleted.
 
 HIGHLIGHTING OBJECTS:
-Click the object, then type "hl" then Enter/Return.
+- Click the object, then type "hl" then Enter/Return.
 
 TOGGLING FLOW:
-Click the Toggle Flow Button to toggle between showing/unshowing flow along edges.
+- Click the Toggle Flow Button to toggle between showing/unshowing flow along edges.
 
 SAVE GRAPH:
-Type a valid name (e.g. flownetwork), then click the Save Button.
-(They will be saved into a folder called saved_graphs. This folder is
-created once you run this program for the first time!)
+- Type a valid name (e.g. flownetwork), then click the Save Button.
+** Note **
+    (1) They will be saved into a folder called saved_graphs. 
+    (2) This folder is created once you run this program for the first time!
 
 RUNNING A BFS/DFS:
-Click the source node, then click BFS or DFS. The source node should be highlighted.
-Then keep clicking the Next button to show the next step in the algorithm.
-Once it's completed, clicking Next will remove all the highlights.
+- Click the source node, then click BFS or DFS. The source node should be highlighted.
+- Then keep clicking the Next button to show the next step in the algorithm.
+- Once it's completed, clicking Next will remove all the highlights.
 '''
 
 ####################
