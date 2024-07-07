@@ -9,8 +9,9 @@ from matplotlib.widgets import Button
 ########### Parameters ###########
 noderad = 0.6
 textsize = 15
+margin = 2
 velocityscale = 0.02
-loadfilename = "dijks2"
+loadfilename = ""
 ##################################
 
 '''
@@ -114,10 +115,10 @@ class node:
         self.coord = (x,y)
         self.label = s
 
-        self.xrange[0] = min(self.xrange[0], x-2)
-        self.xrange[1] = max(self.xrange[1], x+2)
-        self.yrange[0] = min(self.yrange[0], y-2)
-        self.yrange[1] = max(self.yrange[1], y+2)
+        self.xrange[0] = min(self.xrange[0], x-margin)
+        self.xrange[1] = max(self.xrange[1], x+margin)
+        self.yrange[0] = min(self.yrange[0], y-margin)
+        self.yrange[1] = max(self.yrange[1], y+margin)
         
         nodeset[(x,y)] = self
         adjmat[self] = []
@@ -224,8 +225,6 @@ def reshape_diagram():
     Reshapes the diagram dimensions according to existing node coordinates.
     '''
     ax.set(xlim= node.xrange, ylim= node.yrange, aspect=1, xticks=[], yticks=[])
-
-reshape_diagram()
 
 
 ############################
@@ -377,12 +376,11 @@ def dijkstra(graph, source):
                             "$\\infty$" if fakedist[nb] == float("inf") else str(fakedist[nb]), 
                             "blue")
 
-        parentedge, foundedge = None, False
+        foundedge = None, False
         for other in truedist:
             for nb, e in graph[other]:
                 if nb == popped and poppeddist == truedist[other] + e.weight:
                     foundedge = True
-                    parentedge = e
                     break
             if foundedge: break
 
@@ -518,8 +516,28 @@ def update(frame):
 
 ani = anime.FuncAnimation(fig=fig, func=update, frames=1000, interval=30)
 
-
 if loadfilename: loadgraph(loadfilename)
+
+
+################
+# Manual Build #
+################
+
+N,R = 10,100
+
+margin = 20
+
+tenrings = [node(int(R*math.cos(2*math.pi*i/N)),int(R*math.sin(2*math.pi*i/N)), str(i)) for i in range(N)]
+
+for i in range(N):
+    for j in range(i+1,N):
+        edge(tenrings[i],tenrings[j],arrow=False)
+
+################
+################
+################
+
+reshape_diagram()
 
 plt.show() 
 fig.show()
