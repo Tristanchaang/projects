@@ -15,7 +15,7 @@ loadfilename = ""
 ##################################
 
 '''
-Instructions!!! :D
+Guide!!! :D
 
 You will be able to save a graph after you plot it.
 (recommend to frequently do so because matplotlib often crashes).
