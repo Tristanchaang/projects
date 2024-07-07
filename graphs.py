@@ -7,11 +7,11 @@ from matplotlib import colors
 from matplotlib.widgets import Button
 
 ########### Parameters ###########
-noderad = 0.6
-textsize = 15
-margin = 2
-velocityscale = 0.02
-loadfilename = ""
+noderad = 0.6 # 0.6
+textsize = 15 # 15
+margin = 2 # 2
+velocityscale = 0.02 # 0.01
+loadfilename = "ten"
 ##################################
 
 '''
@@ -49,7 +49,7 @@ then press Enter/Return (
 **Note: (1) Do not use spaces! (2) The order of the attributes doesn't matter**
 
 DELETING OBJECTS (nodes or edges):
-Click the object, then type "del" then Enter/Return.
+Click the object, then Backspace. (OR: type "del" then Enter/Return.)
 **Note: If you delete a node, all edges attached to it will also be deleted.**
 
 HIGHLIGHTING OBJECTS:
@@ -403,6 +403,7 @@ def activatedijks(x):
     nextstep(x)
 dijksbutt.on_clicked(activatedijks)
 
+
 ##########################
 # Input and Click System #
 ##########################
@@ -495,6 +496,10 @@ def onkey(event):
     elif entered == 'enter':
         process_input()
         inputstatus = ""
+    elif entered == 'backspace':
+        inputstatus = "del"
+        process_input()
+        inputstatus = ""
     else:
         inputstatus += '_' if entered=='\\' else entered
     
@@ -523,15 +528,15 @@ if loadfilename: loadgraph(loadfilename)
 # Manual Build #
 ################
 
-N,R = 10,100
+# N,R = 10,10
 
-margin = 20
+# margin = 2
 
-tenrings = [node(int(R*math.cos(2*math.pi*i/N)),int(R*math.sin(2*math.pi*i/N)), str(i)) for i in range(N)]
+# tenrings = [node(int(R*math.cos(2*math.pi*i/N)),int(R*math.sin(2*math.pi*i/N)), str(i)) for i in range(N)]
 
-for i in range(N):
-    for j in range(i+1,N):
-        edge(tenrings[i],tenrings[j],arrow=False)
+# for i in range(N):
+#     for j in range(i+1,N):
+#         edge(tenrings[i],tenrings[j],arrow=False)
 
 ################
 ################
