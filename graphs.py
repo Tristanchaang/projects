@@ -10,7 +10,7 @@ from matplotlib.widgets import Button
 noderad = 0.6
 textsize = 15
 velocityscale = 0.02
-loadfilename = ""
+loadfilename = "dijks2"
 ##################################
 
 '''
@@ -44,11 +44,12 @@ To assign attributes, use commas to separate each attribute, like this:
     >> b=0.5,f=1,und (this creates an edge with weight 0, bend 0.5, flow 1, and undirected)
     >> w=1,f=1 (this creates an edge with weight 1, bend 0, flow 1, and directed)
     >> (nothing inputted: this creates a directed edge with no label, flow, nor bend)
-then press Enter/Return (Note: (1) Do not use spaces! (2) The order of the attributes
-doesn't matter)
+then press Enter/Return (
+**Note: (1) Do not use spaces! (2) The order of the attributes doesn't matter**
 
 DELETING OBJECTS (nodes or edges):
 Click the object, then type "del" then Enter/Return.
+**Note: If you delete a node, all edges attached to it will also be deleted.**
 
 HIGHLIGHTING OBJECTS:
 Click the object, then type "hl" then Enter/Return.
@@ -108,7 +109,7 @@ class node:
 
         self.labelshape = ax.text(x,y,s=s,horizontalalignment='center',verticalalignment='center', size=textsize,zorder=3)
         self.mask = ax.text(x,y,s="",horizontalalignment='center',
-                            verticalalignment='center', size=textsize, c="red", alpha=1, zorder = 2)
+                            verticalalignment='center', size=textsize, c="black", alpha=1, zorder = 2)
 
         self.coord = (x,y)
         self.label = s
@@ -124,7 +125,14 @@ class node:
     def highlight(self, boo, write=""):
         self.shape.set_ec("red" if boo else "black")
         self.shape.set_linewidth(2 if boo else 1)
-        self.mask.set(text=write if boo else "", y=self.coord[1] + 0.6 * noderad *(self.yrange[1]-self.yrange[0])/fig.get_figheight())
+        self.mask.set(text=write if boo else "", 
+                      y=self.coord[1] + 0.6 * noderad * (self.yrange[1]-self.yrange[0])/fig.get_figheight(),
+                      c="red")
+
+    def lowlight(self, boo, write="", color="black"):
+        self.mask.set(text=write if boo else "", 
+                      y=self.coord[1] + 0.6 * noderad * (self.yrange[1]-self.yrange[0])/fig.get_figheight(),
+                      c=color)
 
     def __hash__(self):
         return hash(self.label)
@@ -135,6 +143,9 @@ class node:
     def __del__(self):
         self.shape.remove()
         self.labelshape.remove()
+
+    def __eq__(self, other):
+        return self.coord == other.coord
 
 class edge:
     def __init__(self,node1,node2,weight="",bend = 0, arrow=True, flow=0):
@@ -188,7 +199,7 @@ def arrow_(p,q,weight,bend,arrow):
 
     disp = np.array([[0,1],[-1,0]]) @ np.array([[x2-x1],[y2-y1]]) * bend * 0.5
     x3, y3 = list((disp+np.array([[(x1+x2)/2],[(y1+y2)/2]])).flatten())
-    if weight is not "": ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=1,zorder=0) 
+    if weight != "": ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=1,zorder=0) 
     labelshape = ax.text(x3,y3,s=str(weight),
                          horizontalalignment='center',verticalalignment='center', size=textsize)
 
@@ -338,7 +349,61 @@ def activatedfs(x):
 dfsbutt.on_clicked(activatedfs)
 
 
+'''Dijkstra'''
 
+def dijkstra(graph, source):
+
+    def extractmin(dictionary):
+        return min(list(dictionary.items()), key=lambda x:x[1])[0]
+    
+    fakedist = {node: float("inf") for node in graph}
+    fakedist[source] = 0
+
+    for n in fakedist:
+        n.lowlight(True, "$\\infty$" if fakedist[n] == float("inf") else str(fakedist[n]), "blue")
+
+    truedist = {}
+    
+    while fakedist:
+        popped = extractmin(fakedist)
+        poppeddist = fakedist[popped]
+        
+        truedist[popped] = poppeddist
+
+        for nb, e in graph[popped]:
+            if nb in fakedist:
+                fakedist[nb] = min(fakedist[nb], poppeddist + (e.weight if e.weight!="" else 0))
+                nb.lowlight(True, 
+                            "$\\infty$" if fakedist[nb] == float("inf") else str(fakedist[nb]), 
+                            "blue")
+
+        parentedge, foundedge = None, False
+        for other in truedist:
+            for nb, e in graph[other]:
+                if nb == popped and poppeddist == truedist[other] + e.weight:
+                    foundedge = True
+                    parentedge = e
+                    break
+            if foundedge: break
+
+        nodeyield = [(popped,"\\textbf{"+str(poppeddist)+"}")]
+
+        yield nodeyield + [(e,)] if foundedge else nodeyield
+
+        del fakedist[popped]
+
+dijksbutt = Button(plt.axes([0.55, 0, 0.15, 0.05]), "\\textbf{Dijkstra}", image=None, color='0.85', hovercolor='0.95')
+
+def activatedijks(x):
+    global clickqueue, mission
+    if len(clickqueue)==0:
+        print("Pick a source node first!")
+        return
+    s = nodeset[clickqueue[-1]]
+    mission = dijkstra(adjmat, s)
+    clickqueue = []
+    nextstep(x)
+dijksbutt.on_clicked(activatedijks)
 
 ##########################
 # Input and Click System #
