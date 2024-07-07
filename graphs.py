@@ -11,7 +11,7 @@ noderad = 0.6 # 0.6
 textsize = 15 # 15
 margin = 2 # 2
 velocityscale = 0.02 # 0.01
-loadfilename = "ten"
+loadfilename = ""
 ##################################
 
 '''
@@ -40,17 +40,21 @@ Edges can have the following attributes:
     1. weight (w): weight assigned to the edge (will be displayed on edge too)
     2. bend (b): amount of curvature (recommended range: -1 (left) to 1 (right))
     3. flow (f): amount of flow along the edge (recommended range: 0 to 5)
-    4. directedness: whether to be directed/undirected (und) (default is directed)
+    4. directedness: whether to be directed (dir) / undirected (und)
+                     (default is dir, unless changed via process described shortly below)
 To assign attributes, use commas to separate each attribute, like this:
     >> b=0.5,f=1,und (this creates an edge with weight 0, bend 0.5, flow 1, and undirected)
-    >> w=1,f=1 (this creates an edge with weight 1, bend 0, flow 1, and directed)
+    >> w=1,f=1 (this creates an edge with weight 1, bend 0, flow 1, and directed by default)
     >> (nothing inputted: this creates a directed edge with no label, flow, nor bend)
-then press Enter/Return (
-**Note: (1) Do not use spaces! (2) The order of the attributes doesn't matter**
+then press Enter/Return. 
+** Note: **
+    (1) Do not use spaces! 
+    (2) The order of the attributes doesn't matter
+    (3) To change the default directedness, type dir/und when the clickqueue is empty.
 
 DELETING OBJECTS (nodes or edges):
 Click the object, then Backspace. (OR: type "del" then Enter/Return.)
-**Note: If you delete a node, all edges attached to it will also be deleted.**
+** Note: ** If you delete a node, all edges attached to it will also be deleted.
 
 HIGHLIGHTING OBJECTS:
 Click the object, then type "hl" then Enter/Return.
@@ -413,8 +417,16 @@ inputstatus = '' # Input space
 
 clickqueue = [] # Sequence of clicked coordinates
 
+defaultarrow = True # plot directed edges by default?
+
 def process_input():
-    global clickqueue, nodeset, inputstatus, nodeset, edgeset, adjmat
+    global clickqueue, nodeset, inputstatus, nodeset, edgeset, adjmat, defaultarrow
+
+    if len(clickqueue) == 0:
+        if inputstatus == "und":
+            defaultarrow = False
+        if inputstatus == "dir":
+            defaultarrow = True
 
     if len(clickqueue) == 1:
         if clickqueue[0] not in nodeset:
@@ -454,7 +466,7 @@ def process_input():
             p,q = nodeset[clickqueue[0]], nodeset[clickqueue[1]]
             splitinput = inputstatus.split(",")
 
-            fv, bn, ar, we = 0, 0, True, ""
+            fv, bn, ar, we = 0, 0, defaultarrow, ""
             for prop in splitinput:
                 if "f=" in prop:
                     fv = float(prop[2:])
@@ -462,6 +474,8 @@ def process_input():
                     bn = float(prop[2:])
                 if prop=="und":
                     ar = False
+                if prop=="dir":
+                    ar = True
                 if "w=" in prop:
                     try:
                         we = int(prop[2:])
