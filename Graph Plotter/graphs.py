@@ -13,7 +13,7 @@ margin = 2 # 2
 velocityscale = 0.01 # 0.01
 thickness = 1 # 1
 nodebg = "white" # "white"
-loadfilename = "k5"
+loadfilename = ""
 ##################################
 
 '''
@@ -54,6 +54,9 @@ ADDING EDGES:
     (1) Do not use spaces! 
     (2) The order of the attributes doesn't matter
     (3) To change the default directedness, type dir/und when the clickqueue is empty.
+
+MOVING NODES:
+- Click the node, click a new location, then Enter.
 
 DELETING OBJECTS (nodes or edges):
 - Click the object, then Backspace. (OR: type "del" then Enter/Return.)
@@ -158,14 +161,28 @@ class node:
 
     def __eq__(self, other):
         return self.coord == other.coord
+    
+    def move(self, othercoord):
+        del nodeset[self.coord]
+        x2, y2 = othercoord
+        nodeset[othercoord] = self
+
+        self.coord = othercoord
+        self.shape.set_offsets(np.array([[x2,y2]]))
+        self.labelshape.set(x=x2, y=y2)
+
+        self.xrange[0] = min(self.xrange[0], x2-margin)
+        self.xrange[1] = max(self.xrange[1], x2+margin)
+        self.yrange[0] = min(self.yrange[0], y2-margin)
+        self.yrange[1] = max(self.yrange[1], y2+margin)
+
 
 class edge:
     def __init__(self,node1,node2,weight="",bend = 0, arrow=True, flow=0):
-        self.shape, self.labelshape = arrow_(node1.coord, node2.coord, weight, bend, arrow)
+        self.shape, self.labelshape, self.labelshape2 = arrow_(node1.coord, node2.coord, weight, bend, arrow)
         self.start = node1
         self.end = node2
         self.weight = weight
-        self.distance = ((node1.coord[0]-node2.coord[0])**2+(node1.coord[1]-node2.coord[1])**2)**0.5
         self.bend = bend
         self.arrow = arrow
         self.flowvalue = flow
@@ -195,6 +212,14 @@ class edge:
         self.shape.remove()
         self.flowdots.remove()
         self.labelshape.remove()
+        if self.labelshape2 is not None: self.labelshape2.remove()
+
+
+def bent_midpoint(coord1, coord2, bend):
+    x1,y1 = coord1
+    x2,y2 = coord2
+    disp = np.array([[0,1],[-1,0]]) @ np.array([[x2-x1],[y2-y1]]) * bend * 0.5
+    return list((disp+np.array([[(x1+x2)/2],[(y1+y2)/2]])).flatten())
 
 def arrow_(p,q,weight,bend,arrow):
     '''draws arrow'''
@@ -209,13 +234,15 @@ def arrow_(p,q,weight,bend,arrow):
                                 shrinkA=noderad*20, shrinkB=noderad*20, zorder=0, linewidth=thickness)
     ax.add_artist(shape)
 
-    disp = np.array([[0,1],[-1,0]]) @ np.array([[x2-x1],[y2-y1]]) * bend * 0.5
-    x3, y3 = list((disp+np.array([[(x1+x2)/2],[(y1+y2)/2]])).flatten())
-    if weight != "": ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=thickness,zorder=0) 
+    x3, y3 = bent_midpoint(p,q,bend)
+
+    if weight != "": 
+        labelshape2 = ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=thickness,zorder=0) 
+    else: labelshape2 = None
     labelshape = ax.text(x3,y3,s=str(weight),
                          horizontalalignment='center',verticalalignment='center', size=textsize)
 
-    return shape, labelshape
+    return shape, labelshape, labelshape2
 
 def points_on_line_(p,q,pos,dist,bend=0):
     '''
@@ -499,8 +526,33 @@ def process_input():
                     except:
                         we = float(prop[2:])
 
-
             edge(p,q, weight = we, flow = fv, bend = bn, arrow=ar)
+
+    if len(clickqueue) == 2 and clickqueue[0] in nodeset and clickqueue[1] not in nodeset:
+
+        nodeset[clickqueue[0]].move(clickqueue[1])
+        
+        for edgecoord in edgeset.copy():
+            if edgecoord[0] == clickqueue[0]:
+                for e in edgeset[edgecoord]:
+                    e.shape.set_positions(clickqueue[1], edgecoord[1])
+                    xm, ym = bent_midpoint(clickqueue[1], edgecoord[1], e.bend)
+                    e.labelshape.set(x=xm, y=ym)
+                    if e.labelshape2 is not None:
+                        e.labelshape2.set_offsets(np.array([[xm,ym]]))
+                edgeset[(clickqueue[1], edgecoord[1])] = edgeset[edgecoord]
+                del edgeset[edgecoord]
+                
+            if edgecoord[1] == clickqueue[0]:
+                for e in edgeset[edgecoord]:
+                    e.shape.set_positions(edgecoord[0], clickqueue[1])
+                    xm, ym = bent_midpoint(edgecoord[0], clickqueue[1], e.bend)
+                    e.labelshape.set(x=xm, y=ym)
+                    if e.labelshape2 is not None:
+                        e.labelshape2.set_offsets(np.array([[xm,ym]]))
+                edgeset[(edgecoord[0], clickqueue[1])] = edgeset[edgecoord]
+                del edgeset[edgecoord]
+
 
     clickqueue = []
 
@@ -559,11 +611,15 @@ if loadfilename: loadgraph(loadfilename)
 # Manual Build #
 ################
 
-# N,R = 5,10
+'''Note: Objects built here may not be removeable (due to additional pointers), 
+but you can save it and then reload it as a new graph, then they are removeable.'''
 
-# margin = 3
+N,R = 13,10
 
-# tenrings = [node(-int(R*math.sin(2*math.pi*i/N)),int(R*math.cos(2*math.pi*i/N)), str(i)) for i in range(N)]
+margin = 3
+
+for i in range(N):
+    node(-int(R*math.sin(2*math.pi*i/N)),int(R*math.cos(2*math.pi*i/N)), str(i+1))
 
 # for i in range(N):
 #     for j in range(i+1,N):
