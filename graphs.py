@@ -11,7 +11,8 @@ noderad = 0.6 # 0.6
 textsize = 15 # 15
 margin = 2 # 2
 velocityscale = 0.02 # 0.01
-loadfilename = "dijks2"
+thickness = 1.2 # 1
+loadfilename = "k33"
 ##################################
 
 '''
@@ -113,7 +114,7 @@ class node:
 
     def __init__(self,x,y,s):
         # very big scatter pt (circ)
-        self.shape = ax.scatter([x],[y], s=noderad*1000, ec="black", color="white", linewidth=1,zorder=1) 
+        self.shape = ax.scatter([x],[y], s=noderad*1000, ec="black", color="white", linewidth=thickness,zorder=1) 
 
         self.labelshape = ax.text(x,y,s=s,horizontalalignment='center',verticalalignment='center', size=textsize,zorder=3)
         self.mask = ax.text(x,y,s="",horizontalalignment='center',
@@ -202,12 +203,12 @@ def arrow_(p,q,weight,bend,arrow):
     shape = mp.FancyArrowPatch((x1,y1),(x2,y2), 
                                 arrowstyle=arrowstyle,
                                 connectionstyle=mp.ConnectionStyle("arc3", rad=bend),
-                                shrinkA=noderad*20, shrinkB=noderad*20, zorder=0)
+                                shrinkA=noderad*20, shrinkB=noderad*20, zorder=0, linewidth=thickness)
     ax.add_artist(shape)
 
     disp = np.array([[0,1],[-1,0]]) @ np.array([[x2-x1],[y2-y1]]) * bend * 0.5
     x3, y3 = list((disp+np.array([[(x1+x2)/2],[(y1+y2)/2]])).flatten())
-    if weight != "": ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=1,zorder=0) 
+    if weight != "": ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=thickness,zorder=0) 
     labelshape = ax.text(x3,y3,s=str(weight),
                          horizontalalignment='center',verticalalignment='center', size=textsize)
 
@@ -555,11 +556,11 @@ if loadfilename: loadgraph(loadfilename)
 # Manual Build #
 ################
 
-# N,R = 10,10
+# N,R = 5,10
 
-# margin = 2
+# margin = 3
 
-# tenrings = [node(int(R*math.cos(2*math.pi*i/N)),int(R*math.sin(2*math.pi*i/N)), str(i)) for i in range(N)]
+# tenrings = [node(-int(R*math.sin(2*math.pi*i/N)),int(R*math.cos(2*math.pi*i/N)), str(i)) for i in range(N)]
 
 # for i in range(N):
 #     for j in range(i+1,N):
