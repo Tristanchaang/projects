@@ -12,7 +12,7 @@ textsize = 15 # 15
 margin = 2 # 2
 velocityscale = 0.02 # 0.01
 thickness = 1.2 # 1
-loadfilename = "k33"
+loadfilename = "dijks2"
 ##################################
 
 '''
@@ -81,9 +81,11 @@ RUNNING A BFS/DFS:
 # CODE STARTS HERE #
 ####################
 
+cur_dir = os.path.dirname(__file__) # directory of this file
+
 # create folder if absent
-if not os.path.exists("saved_graphs"):
-    os.makedirs("saved_graphs")
+if not os.path.exists(os.path.join(cur_dir, 'saved_graphs')):
+    os.makedirs(os.path.join(cur_dir, 'saved_graphs'))
 
 # activate LaTeX
 plt.rcParams.update({
@@ -291,7 +293,7 @@ def savegraph(x):
 savebutt.on_clicked(savegraph)
 
 def loadgraph(jsonname):
-    with open("saved_graphs/" + jsonname + ".json", "r") as f:
+    with open(os.path.join(cur_dir, "saved_graphs/" + jsonname + ".json"), "r") as f:
         file = json.load(f)
     for n in file["nodes"]:
         node(*n)
@@ -394,7 +396,7 @@ def dijkstra(graph, source):
                             "$\\infty$" if fakedist[nb] == float("inf") else str(fakedist[nb]), 
                             "blue")
 
-        foundedge = None, False
+        foundedge = False
         for other in truedist:
             for nb, e in graph[other]:
                 if nb == popped and poppeddist == truedist[other] + e.weight:

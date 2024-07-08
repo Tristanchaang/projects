@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt 
 from matplotlib import colors
 from PIL import Image
-import random
+import random,os
 
 bruteforceonly = False
 regionlimit = 10 # 10
@@ -33,7 +33,9 @@ def load_greyscale_image(filename):
         width, height = img.size
         return {"height": height, "width": width, "pixels": pixels}
 
-x = load_greyscale_image("maps/" + mapname)
+cur_dir = os.path.dirname(__file__) # directory of this file
+
+x = load_greyscale_image(os.path.join(cur_dir, "maps/" + mapname))
 m,n = x["height"],x["width"]
 rawdata = np.array(x["pixels"]).reshape((m,n))
 data = np.ones((m,n)) * 6
@@ -120,8 +122,6 @@ reg, adjset = buckets(newmap)
 
 numstates = len(reg)-2 # -2 corresponds to borders, -1 corresponds to sea
 
-print(numstates)
-
 # exit()
 
 def converter(gamestate):
@@ -141,7 +141,7 @@ else:
     fig, (ax1,ax2) = plt.subplots(1,2)
 fig.set_figheight(3)
 fig.set_figwidth(10)
-fig.set_size_inches(15, 10)
+fig.set_size_inches(15, 7)
 
 
 fig.suptitle("4-coloring: Brute Force" + ("" if bruteforceonly else " vs DFS"))
