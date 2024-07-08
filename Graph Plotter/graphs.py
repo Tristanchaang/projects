@@ -10,9 +10,10 @@ from matplotlib.widgets import Button
 noderad = 0.6 # 0.6
 textsize = 15 # 15
 margin = 2 # 2
-velocityscale = 0.02 # 0.01
-thickness = 1.2 # 1
-loadfilename = "dijks2"
+velocityscale = 0.01 # 0.01
+thickness = 1 # 1
+nodebg = "white" # "white"
+loadfilename = "k5"
 ##################################
 
 '''
@@ -116,7 +117,7 @@ class node:
 
     def __init__(self,x,y,s):
         # very big scatter pt (circ)
-        self.shape = ax.scatter([x],[y], s=noderad*1000, ec="black", color="white", linewidth=thickness,zorder=1) 
+        self.shape = ax.scatter([x],[y], s=noderad*1000, ec="black", color=nodebg, linewidth=thickness,zorder=1) 
 
         self.labelshape = ax.text(x,y,s=s,horizontalalignment='center',verticalalignment='center', size=textsize,zorder=3)
         self.mask = ax.text(x,y,s="",horizontalalignment='center',

@@ -6,9 +6,9 @@ from PIL import Image
 import random,os
 
 bruteforceonly = False
-regionlimit = 10 # 10
+regionlimit = 20 # 10
 bordersize = 2 # 2
-mapname = "USA.jpeg"
+mapname = "K4.png"
 
 def load_greyscale_image(filename):
     """
@@ -133,8 +133,6 @@ def converter(gamestate):
 cmap = colors.ListedColormap(['white', 'red', 'yellow', 'blue', 'green', 'black'])
 norm = colors.BoundaryNorm([0,1,2,3,4,5,6], cmap.N)
 
-
-
 if bruteforceonly:
     fig, ax1 = plt.subplots(1,1)
 else:
@@ -148,11 +146,23 @@ fig.suptitle("4-coloring: Brute Force" + ("" if bruteforceonly else " vs DFS"))
 
 def addone(gamestate):
     i = 0
-    while gamestate[i] == 4: i += 1
+    while i<numstates and gamestate[i] == 4: i += 1
     if i == numstates: return None
     return [1 for _ in gamestate[:i]]+ [gamestate[i]+1] + gamestate[i+1:]
 
 gamestate = [0 for _ in range(numstates)]
+
+
+def verifyvic(gamestate):
+    victory = True
+    for start, nbs in adjset.items():
+        for end in nbs:
+            if end != start and start>=0 and end>=0:
+                if gamestate[start]*gamestate[end]==0 or gamestate[start]==gamestate[end]:
+                    victory = False
+                    break
+        if not victory: break
+    return victory
 
 done = False
 
@@ -166,6 +176,7 @@ if True:
         gamestate = addone(gamestate)
         if gamestate is None: break
         ax1.imshow(converter(gamestate), interpolation='nearest', cmap=cmap, norm =norm) 
+        
 
         if not bruteforceonly:
             if agenda:
@@ -193,9 +204,13 @@ if True:
                 ax2.set_yticks([])
                 ax2.imshow(converter(last), interpolation='nearest', cmap=cmap, norm =norm) 
             
-        plt.pause(0.05)
+        plt.pause(0.01)
         ax1.cla()
         if not bruteforceonly: ax2.cla()
+
+        if verifyvic(gamestate): 
+            print(gamestate)
+            break
   
 # plt.savefig('pixel_plot.png') 
   
