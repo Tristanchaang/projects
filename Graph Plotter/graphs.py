@@ -13,7 +13,7 @@ margin = 2 # amount of white space from border, default 2
 velocityscale = 0.01 # speed of flow dots, default 0.01
 thickness = 1 # thickness of lines, default 1
 nodebg = "white" # node color, default "white"
-loadfilename = "flownetworkemp" # name of saved graph, without .json
+loadfilename = "edmonds" # name of saved graph, without .json
 ##################################
 
 '''
@@ -44,7 +44,7 @@ ADDING EDGES:
     2. bend (b): amount of curvature (recommended range: -1 (left) to 1 (right))
     3. flow (f): amount of flow along the edge (recommended range: 0 to 5)
     4. directedness: whether to be directed (dir) / undirected (und)
-                     (default is dir, unless changed via process described shortly below)
+                     (default is dir, unless changed via commands stated below)
 - To assign attributes, use commas to separate each attribute, like this:
     >> b=0.5,f=1,und (this creates an edge with weight 0, bend 0.5, flow 1, and undirected)
     >> w=1,f=1 (this creates an edge with weight 1, bend 0, flow 1, and directed by default)
@@ -53,7 +53,6 @@ ADDING EDGES:
 ** Note **
     (1) Do not use spaces! 
     (2) The order of the attributes doesn't matter
-    (3) To change the default directedness, type dir/und when the clickqueue is empty.
 
 MOVING NODES:
 - Click the node, click a new location, then Enter.
@@ -75,10 +74,19 @@ SAVE GRAPH:
     (1) They will be saved into a folder called saved_graphs. 
     (2) This folder is created once you run this program for the first time!
 
-RUNNING A BFS/DFS:
-- Click the source node, then click BFS or DFS. The source node should be highlighted.
+RUNNING A BFS/DFS/Dijkstra:
+- Click the source node, then click BFS/DFS/Dijkstra. The source node should be highlighted.
 - Then keep clicking the Next button to show the next step in the algorithm.
 - Once it's completed, clicking Next will remove all the highlights.
+
+RUNNING Edmonds-Karp:
+- Click the source node and the terminal node, then click Edmonds-Karp. Same as above.
+- Toggle on/off flow to see it from different perspectives!
+
+ADDITIONAL COMMANDS:
+- und: Makes plotting edges undirected by default
+- dir: Makes plotting edges directed by default
+- zeroflow: Zeros all flows
 '''
 
 ####################
@@ -543,7 +551,6 @@ def edmondskarp(graph, source, terminal):
         ag = augmentingpath(graph)  
 
 
-
 ##########################
 # Input and Click System #
 ##########################
@@ -565,6 +572,11 @@ def process_input():
         if inputstatus == "dir":
             defaultarrow = True
             print("Default: Directed edges")
+        if inputstatus == "zeroflow":
+            for _,es in edgeset.items():
+                for e in es:
+                    e.changeflow(0)
+            print("Zeroed all flows")
 
     if len(clickqueue) == 1: # Click Queue: coord0
         coord0 = clickqueue[0]
