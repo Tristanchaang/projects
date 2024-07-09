@@ -13,7 +13,7 @@ margin = 2 # amount of white space from border, default 2
 velocityscale = 0.01 # speed of flow dots, default 0.01
 thickness = 1 # thickness of lines, default 1
 nodebg = "white" # node color, default "white"
-loadfilename = "edmonds" # name of saved graph, without .json
+loadfilename = "bfs" # name of saved graph, without .json
 ##################################
 
 '''
@@ -347,7 +347,7 @@ def savegraph(_):
         for e in es:
             for_json["edges"].append((e.start.coord, e.end.coord, e.weight, e.bend, e.arrow, e.flowvalue))
     
-    with open("saved_graphs/" + inputstatus + ".json", "w") as f:
+    with open(relpath("saved_graphs/" + inputstatus + ".json"), "w") as f:
         json.dump(for_json,f)
     
     print("Saved as " + inputstatus + ".json")
@@ -609,16 +609,25 @@ def process_input():
             print("Highlighted edge(s)")
 
         elif inputstatus == "del":
-            
+
             for _, nb in adjmat.items():
                 for ve in nb:
                     if ve[1].start.coord == coord0 and ve[1].end.coord == coord1:
                         nb.remove(ve)
+                    if ve[1].start.coord == coord1 and ve[1].end.coord == coord0 and not ve[1].arrow:
+                        nb.remove(ve)
+            
+            if (coord0,coord1) in edgeset:
+                for e in edgeset[(coord0,coord1)]:
+                    del e
 
-            for e in edgeset[(coord0,coord1)]:
-                del e
+                del edgeset[(coord0,coord1)]
+            
+            if (coord1, coord0) in edgeset:
+                edgeset[(coord1,coord0)] = [e for e in edgeset[(coord1,coord0)] if e.arrow]
 
-            del edgeset[(coord0,coord1)]
+                if edgeset[(coord1,coord0)] == []: del edgeset[(coord1,coord0)]
+
             print("Deleted edge(s)")
 
         else:
