@@ -7,13 +7,13 @@ from matplotlib import colors
 from matplotlib.widgets import Button
 
 ########### Parameters ###########
-noderad = 0.6 # 0.6
-textsize = 15 # 15
-margin = 2 # 2
-velocityscale = 0.01 # 0.01
-thickness = 1 # 1
-nodebg = "white" # "white"
-loadfilename = ""
+noderad = 0.6 # radius of the nodes, default 0.6
+textsize = 15 # size of labels, default 15
+margin = 2 # amount of white space from border, default 2
+velocityscale = 0.01 # speed of flow dots, default 0.01
+thickness = 1 # thickness of lines, default 1
+nodebg = "white" # node color, default "white"
+loadfilename = "" # name of saved graph, without .json
 ##################################
 
 '''
@@ -30,11 +30,11 @@ At any point of time, to erase the current input (e.g. after clicking
 the wrong keys), press Esc to cancel.
 
 ADDING NODES:
-- Click anywhere on the figure. Type a name of the node (e.g. x) then Enter/Return.
+- Click anywhere on the figure. Type a name of the node in LaTeX (e.g. x or \alpha) then Enter/Return.
 ** Note **
     (1) This will plot a node at the nearest lattice point.
     (2) Node name must be unique to the given coordinate.
-    (3) Use the \ key for _, e.g. for d_2
+    (3) Use the ` key for _, e.g. for d_2
 
 ADDING EDGES:
 - Click the first node, then the second node, then type a name for the edge (optional).
@@ -86,10 +86,11 @@ RUNNING A BFS/DFS:
 ####################
 
 cur_dir = os.path.dirname(__file__) # directory of this file
+relpath = lambda x: os.path.join(cur_dir, x)
 
 # create folder if absent
-if not os.path.exists(os.path.join(cur_dir, 'saved_graphs')):
-    os.makedirs(os.path.join(cur_dir, 'saved_graphs'))
+if not os.path.exists(relpath('saved_graphs')):
+    os.makedirs(relpath('saved_graphs'))
 
 # activate LaTeX
 plt.rcParams.update({
@@ -107,8 +108,7 @@ for param, shortcuts in plt.rcParams.items():
 
 # create figure
 fig, ax = plt.subplots()
-fig.set_figheight(5)
-fig.set_figwidth(5)
+fig.set(figheight=6, figwidth=15) # dimensions of window
 
 nodeset = {} # maps node coordinates to node objects
 edgeset = {} # maps edge coordinate pairs to edge objects
@@ -119,14 +119,17 @@ class node:
     yrange = [-2, 2]
 
     def __init__(self,x,y,s):
+
         # very big scatter pt (circ)
         self.shape = ax.scatter([x],[y], s=noderad*1000, ec="black", color=nodebg, linewidth=thickness,zorder=1) 
 
         self.labelshape = ax.text(x,y,s=s,horizontalalignment='center',verticalalignment='center', size=textsize,zorder=3)
+        
         self.mask = ax.text(x,y,s="",horizontalalignment='center',
                             verticalalignment='center', size=textsize, c="black", alpha=1, zorder = 2)
 
         self.coord = (x,y)
+
         self.label = s
 
         self.xrange[0] = min(self.xrange[0], x-margin)
@@ -138,26 +141,29 @@ class node:
         adjmat[self] = []
 
     def highlight(self, boo, write=""):
-        self.shape.set_ec("red" if boo else "black")
-        self.shape.set_linewidth(2 if boo else 1)
+        self.shape.set(ec="red" if boo else "black",
+                       linewidth = 2 if boo else 1)
         self.mask.set(text=write if boo else "", 
+                      x=self.coord[0],
                       y=self.coord[1] + 0.6 * noderad * (self.yrange[1]-self.yrange[0])/fig.get_figheight(),
                       c="red")
 
     def lowlight(self, boo, write="", color="black"):
         self.mask.set(text=write if boo else "", 
+                      x=self.coord[0],
                       y=self.coord[1] + 0.6 * noderad * (self.yrange[1]-self.yrange[0])/fig.get_figheight(),
                       c=color)
 
     def __hash__(self):
         return hash(self.label)
-    
+
     def __repr__(self):
         return self.label[1:-1]
-    
+
     def __del__(self):
         self.shape.remove()
         self.labelshape.remove()
+        self.mask.remove()
 
     def __eq__(self, other):
         return self.coord == other.coord
@@ -192,6 +198,7 @@ class edge:
         adjmat[self.start].append((self.end, self))
         if not arrow: 
             adjmat[self.end].append((self.start, self))
+
     def dispflow(self, pos):
         dist = 1/self.flowvalue if self.flowvalue!=0 else None
         if dist: 
@@ -203,8 +210,10 @@ class edge:
     def highlight(self, boo):
         self.shape.set_color("red" if boo else "black")
         self.shape.set_linewidth(2 if boo else 1)
+
     def __hash__(self):
         return hash((self.start,self.end,self.bend))
+
     def __repr__(self):
         return self.start.__repr__() + "-" + self.end.__repr__()
     
@@ -239,6 +248,7 @@ def arrow_(p,q,weight,bend,arrow):
     if weight != "": 
         labelshape2 = ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=thickness,zorder=0) 
     else: labelshape2 = None
+
     labelshape = ax.text(x3,y3,s=str(weight),
                          horizontalalignment='center',verticalalignment='center', size=textsize)
 
@@ -274,6 +284,7 @@ def reshape_diagram():
 
 butt = Button(plt.axes([0, 0, 0.2, 0.05]), "\\textbf{Toggle Flow}", image=None, color='0.85', hovercolor='0.95')
 showflow = False
+
 def toggleflow(_):
     global showflow
     showflow = not showflow
@@ -285,7 +296,7 @@ butt.on_clicked(toggleflow)
 nextbutt = Button(plt.axes([0.9, 0, 0.1, 0.05]), "\\textbf{Next}", image=None, color='0.85', hovercolor='0.95')
 mission = None
 
-def nextstep(x):
+def nextstep(_):
     global clickqueue
     try: new = next(mission)
     except: 
@@ -305,7 +316,8 @@ nextbutt.on_clicked(nextstep)
 
 savebutt = Button(plt.axes([0.2, 0, 0.1, 0.05]), "\\textbf{Save}", image=None, color='0.85', hovercolor='0.95')
 
-def savegraph(x):
+def savegraph(_):
+    global inputstatus
     for_json = {
         "nodes": [],
         "edges": []
@@ -318,10 +330,15 @@ def savegraph(x):
     
     with open("saved_graphs/" + inputstatus + ".json", "w") as f:
         json.dump(for_json,f)
+    
+    print("Saved as " + inputstatus + ".json")
+    inputstatus = ""
+    print('>>', inputstatus)
+
 savebutt.on_clicked(savegraph)
 
 def loadgraph(jsonname):
-    with open(os.path.join(cur_dir, "saved_graphs/" + jsonname + ".json"), "r") as f:
+    with open(relpath("saved_graphs/" + jsonname + ".json"), "r") as f:
         file = json.load(f)
     for n in file["nodes"]:
         node(*n)
@@ -331,10 +348,36 @@ def loadgraph(jsonname):
     reshape_diagram()
 
 
+'''Decorator'''
+
+def activatebutt(butt):
+
+    def f(func):
+        
+        def activatealg(x):
+
+            global clickqueue, mission
+
+            if len(clickqueue)==0:
+                print("Pick a source node first!")
+                return
+
+            mission = func(adjmat, nodeset[clickqueue[-1]]) 
+            clickqueue = []
+            nextstep(x)
+
+        butt.on_clicked(activatealg)
+
+        return func
+
+    return f
+
+
 '''BFS'''
 
 bfsbutt = Button(plt.axes([0.8, 0, 0.1, 0.05]), "\\textbf{BFS}", image=None, color='0.85', hovercolor='0.95')
 
+@activatebutt(bfsbutt)
 def bfs(adj, source):
     visited = {source}
     levels = [{source}]
@@ -351,22 +394,12 @@ def bfs(adj, source):
                     levels[cur_level+1].add(nb)
         cur_level += 1
 
-def activatebfs(x):
-    global clickqueue, mission
-    if len(clickqueue)==0:
-        print("Pick a source node first!")
-        return
-
-    mission = bfs(adjmat, nodeset[clickqueue[-1]]) 
-    clickqueue = []
-    nextstep(x)
-bfsbutt.on_clicked(activatebfs)
-
 
 '''DFS'''
 
 dfsbutt = Button(plt.axes([0.7, 0, 0.1, 0.05]), "\\textbf{DFS}", image=None, color='0.85', hovercolor='0.95')
 
+@activatebutt(dfsbutt)
 def dfs(graph, source):
     visited = {source}
     stack = [(source,)]
@@ -385,19 +418,12 @@ def dfs(graph, source):
         if remove_from_stack:
             stack.pop()
 
-def activatedfs(x):
-    global clickqueue, mission
-    if len(clickqueue)==0:
-        print("Pick a source node first!")
-        return
-    mission = dfs(adjmat, nodeset[clickqueue[-1]])
-    clickqueue = []
-    nextstep(x)
-dfsbutt.on_clicked(activatedfs)
-
 
 '''Dijkstra'''
 
+dijksbutt = Button(plt.axes([0.55, 0, 0.15, 0.05]), "\\textbf{Dijkstra}", image=None, color='0.85', hovercolor='0.95')
+
+@activatebutt(dijksbutt)
 def dijkstra(graph, source):
 
     def extractmin(dictionary):
@@ -438,19 +464,6 @@ def dijkstra(graph, source):
 
         del fakedist[popped]
 
-dijksbutt = Button(plt.axes([0.55, 0, 0.15, 0.05]), "\\textbf{Dijkstra}", image=None, color='0.85', hovercolor='0.95')
-
-def activatedijks(x):
-    global clickqueue, mission
-    if len(clickqueue)==0:
-        print("Pick a source node first!")
-        return
-    s = nodeset[clickqueue[-1]]
-    mission = dijkstra(adjmat, s)
-    clickqueue = []
-    nextstep(x)
-dijksbutt.on_clicked(activatedijks)
-
 
 ##########################
 # Input and Click System #
@@ -466,48 +479,59 @@ defaultarrow = True # plot directed edges by default?
 def process_input():
     global clickqueue, nodeset, inputstatus, nodeset, edgeset, adjmat, defaultarrow
 
-    if len(clickqueue) == 0:
+    if len(clickqueue) == 0: # Click Queue: 
         if inputstatus == "und":
             defaultarrow = False
+            print("Default: Undirected edges")
         if inputstatus == "dir":
             defaultarrow = True
+            print("Default: Directed edges")
 
-    if len(clickqueue) == 1:
-        if clickqueue[0] not in nodeset:
-            node(*clickqueue[0],'$'+inputstatus+'$' if inputstatus else '')
-        if clickqueue[0] in nodeset:
+    if len(clickqueue) == 1: # Click Queue: coord0
+        coord0 = clickqueue[0]
+        if coord0 not in nodeset:
+            node(*coord0,'$'+inputstatus+'$' if inputstatus else '')
+            print("Created node")
+        if coord0 in nodeset:
             if inputstatus == "del":
-                del adjmat[nodeset[clickqueue[0]]]
+                del adjmat[nodeset[coord0]]
 
                 for n in adjmat:
-                    adjmat[n] = [ve for ve in adjmat[n] if ve[0].coord != clickqueue[0]]
+                    adjmat[n] = [ve for ve in adjmat[n] if ve[0].coord != coord0]
 
-                edgeset = {ee: e for ee,e in edgeset.items() if ee[0] != clickqueue[0] and ee[1] != clickqueue[0]}
+                edgeset = {ee: e for ee,e in edgeset.items() if ee[0] != coord0 and ee[1] != coord0}
 
-                del nodeset[clickqueue[0]]
+                del nodeset[coord0]
+                print("Deleted node")
+
             elif inputstatus == "hl":
-                nodeset[clickqueue[0]].highlight(True)
+                nodeset[coord0].highlight(True)
+                print("Highlighted node")
 
-    if len(clickqueue) == 2 and clickqueue[0] in nodeset and clickqueue[1] in nodeset:
+    if len(clickqueue) == 2 and clickqueue[0] in nodeset and clickqueue[1] in nodeset: # Click Queue: coord0 coord1
         
+        coord0, coord1 = clickqueue
+
         if inputstatus == "hl":
-            for e in edgeset[(clickqueue[0],clickqueue[1])]:
+            for e in edgeset[(coord0,coord1)]:
                 e.highlight(True)
+            print("Highlighted edge(s)")
 
         elif inputstatus == "del":
             
             for _, nb in adjmat.items():
                 for ve in nb:
-                    if ve[1].start.coord == clickqueue[0] and ve[1].end.coord == clickqueue[1]:
+                    if ve[1].start.coord == coord0 and ve[1].end.coord == coord1:
                         nb.remove(ve)
 
-            for e in edgeset[(clickqueue[0],clickqueue[1])]:
+            for e in edgeset[(coord0,coord1)]:
                 del e
 
-            del edgeset[(clickqueue[0],clickqueue[1])]
+            del edgeset[(coord0,coord1)]
+            print("Deleted edge(s)")
 
         else:
-            p,q = nodeset[clickqueue[0]], nodeset[clickqueue[1]]
+            p,q = nodeset[coord0], nodeset[coord1]
             splitinput = inputstatus.split(",")
 
             fv, bn, ar, we = 0, 0, defaultarrow, ""
@@ -528,31 +552,36 @@ def process_input():
 
             edge(p,q, weight = we, flow = fv, bend = bn, arrow=ar)
 
+            print("Created edge")
+
     if len(clickqueue) == 2 and clickqueue[0] in nodeset and clickqueue[1] not in nodeset:
 
-        nodeset[clickqueue[0]].move(clickqueue[1])
+        coord0, coord1 = clickqueue
+
+        nodeset[coord0].move(coord1)
         
         for edgecoord in edgeset.copy():
-            if edgecoord[0] == clickqueue[0]:
+            if edgecoord[0] == coord0:
                 for e in edgeset[edgecoord]:
-                    e.shape.set_positions(clickqueue[1], edgecoord[1])
-                    xm, ym = bent_midpoint(clickqueue[1], edgecoord[1], e.bend)
+                    e.shape.set_positions(coord1, edgecoord[1])
+                    xm, ym = bent_midpoint(coord1, edgecoord[1], e.bend)
                     e.labelshape.set(x=xm, y=ym)
                     if e.labelshape2 is not None:
                         e.labelshape2.set_offsets(np.array([[xm,ym]]))
-                edgeset[(clickqueue[1], edgecoord[1])] = edgeset[edgecoord]
+                edgeset[(coord1, edgecoord[1])] = edgeset[edgecoord]
                 del edgeset[edgecoord]
                 
-            if edgecoord[1] == clickqueue[0]:
+            if edgecoord[1] == coord0:
                 for e in edgeset[edgecoord]:
-                    e.shape.set_positions(edgecoord[0], clickqueue[1])
-                    xm, ym = bent_midpoint(edgecoord[0], clickqueue[1], e.bend)
+                    e.shape.set_positions(edgecoord[0], coord1)
+                    xm, ym = bent_midpoint(edgecoord[0], coord1, e.bend)
                     e.labelshape.set(x=xm, y=ym)
                     if e.labelshape2 is not None:
                         e.labelshape2.set_offsets(np.array([[xm,ym]]))
-                edgeset[(edgecoord[0], clickqueue[1])] = edgeset[edgecoord]
+                edgeset[(edgecoord[0], coord1)] = edgeset[edgecoord]
                 del edgeset[edgecoord]
 
+        print("Moved node")
 
     clickqueue = []
 
@@ -571,6 +600,8 @@ def onkey(event):
     
     entered = event.key
     
+    toprint = True
+
     if entered == 'escape':
         inputstatus = ''
         clickqueue = []
@@ -583,10 +614,12 @@ def onkey(event):
         inputstatus = "del"
         process_input()
         inputstatus = ""
+    elif len(entered)==1:
+        inputstatus += '_' if entered=='`' else entered
     else:
-        inputstatus += '_' if entered=='\\' else entered
+        toprint = False
     
-    print('>>', inputstatus)
+    if toprint: print('>>', inputstatus)
     reshape_diagram()
 fig.canvas.mpl_connect('key_press_event', onkey)
 
@@ -614,12 +647,12 @@ if loadfilename: loadgraph(loadfilename)
 '''Note: Objects built here may not be removeable (due to additional pointers), 
 but you can save it and then reload it as a new graph, then they are removeable.'''
 
-N,R = 13,10
+# N,R = 15,10
 
-margin = 3
+# margin = 3
 
-for i in range(N):
-    node(-int(R*math.sin(2*math.pi*i/N)),int(R*math.cos(2*math.pi*i/N)), str(i+1))
+# for i in range(N):
+#     node(-int(R*math.sin(2*math.pi*i/N)),int(R*math.cos(2*math.pi*i/N)), str(i+1))
 
 # for i in range(N):
 #     for j in range(i+1,N):
