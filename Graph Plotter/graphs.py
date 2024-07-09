@@ -13,7 +13,7 @@ margin = 2 # amount of white space from border, default 2
 velocityscale = 0.01 # speed of flow dots, default 0.01
 thickness = 1 # thickness of lines, default 1
 nodebg = "white" # node color, default "white"
-loadfilename = "" # name of saved graph, without .json
+loadfilename = "flownetworkemp" # name of saved graph, without .json
 ##################################
 
 '''
@@ -123,7 +123,7 @@ class node:
         # very big scatter pt (circ)
         self.shape = ax.scatter([x],[y], s=noderad*1000, ec="black", color=nodebg, linewidth=thickness,zorder=1) 
 
-        self.labelshape = ax.text(x,y,s=s,horizontalalignment='center',verticalalignment='center', size=textsize,zorder=3)
+        self.labeltext = ax.text(x,y,s=s,horizontalalignment='center',verticalalignment='center', size=textsize,zorder=3)
         
         self.mask = ax.text(x,y,s="",horizontalalignment='center',
                             verticalalignment='center', size=textsize, c="black", alpha=1, zorder = 2)
@@ -162,7 +162,7 @@ class node:
 
     def __del__(self):
         self.shape.remove()
-        self.labelshape.remove()
+        self.labeltext.remove()
         self.mask.remove()
 
     def __eq__(self, other):
@@ -175,7 +175,7 @@ class node:
 
         self.coord = othercoord
         self.shape.set_offsets(np.array([[x2,y2]]))
-        self.labelshape.set(x=x2, y=y2)
+        self.labeltext.set(x=x2, y=y2)
 
         self.xrange[0] = min(self.xrange[0], x2-margin)
         self.xrange[1] = max(self.xrange[1], x2+margin)
@@ -185,7 +185,7 @@ class node:
 
 class edge:
     def __init__(self,node1,node2,weight="",bend = 0, arrow=True, flow=0):
-        self.shape, self.labelshape, self.labelshape2 = arrow_(node1.coord, node2.coord, weight, bend, arrow)
+        self.shape, self.labeltext, self.labelbg = arrow_(node1.coord, node2.coord, weight, bend, arrow, flow)
         self.start = node1
         self.end = node2
         self.weight = weight
@@ -199,17 +199,28 @@ class edge:
         if not arrow: 
             adjmat[self.end].append((self.start, self))
 
-    def dispflow(self, pos):
-        dist = 1/self.flowvalue if self.flowvalue!=0 else None
-        if dist: 
-            pts = points_on_line_(self.start.coord, self.end.coord, pos, dist, bend = self.bend)
-            self.flowdots.set_offsets(np.array(pts))
+    def dispflow(self, pos, boo):
+        if boo:
+            dist = 1/self.flowvalue if self.flowvalue!=0 else None
+            if dist: 
+                self.flowdots.set_visible(True)
+                pts = points_on_line_(self.start.coord, self.end.coord, pos, dist, bend = self.bend)
+                self.flowdots.set_offsets(np.array(pts))
+            else:
+                self.flowdots.set_visible(False)
         else:
             self.flowdots.set_visible(False)
     
     def highlight(self, boo):
-        self.shape.set_color("red" if boo else "black")
-        self.shape.set_linewidth(2 if boo else 1)
+        self.shape.set(color="red" if boo else "black", linewidth = 2 if boo else 1)
+    
+    def changeflow(self, newvalue):
+        self.flowvalue = newvalue
+        self.labeltext.set(text=("" if self.flowvalue==0 else (str(self.flowvalue)+"/")) + str(self.weight))
+
+    def showweight(self, boo):
+        if self.labelbg is not None: self.labelbg.set_visible(boo)
+        self.labeltext.set_visible(boo)
 
     def __hash__(self):
         return hash((self.start,self.end,self.bend))
@@ -220,8 +231,8 @@ class edge:
     def __del__(self):
         self.shape.remove()
         self.flowdots.remove()
-        self.labelshape.remove()
-        if self.labelshape2 is not None: self.labelshape2.remove()
+        self.labeltext.remove()
+        if self.labelbg is not None: self.labelbg.remove()
 
 
 def bent_midpoint(coord1, coord2, bend):
@@ -230,7 +241,7 @@ def bent_midpoint(coord1, coord2, bend):
     disp = np.array([[0,1],[-1,0]]) @ np.array([[x2-x1],[y2-y1]]) * bend * 0.5
     return list((disp+np.array([[(x1+x2)/2],[(y1+y2)/2]])).flatten())
 
-def arrow_(p,q,weight,bend,arrow):
+def arrow_(p,q,weight,bend,arrow, flow):
     '''draws arrow'''
     x1, y1 = p
     x2, y2 = q
@@ -246,13 +257,13 @@ def arrow_(p,q,weight,bend,arrow):
     x3, y3 = bent_midpoint(p,q,bend)
 
     if weight != "": 
-        labelshape2 = ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=thickness,zorder=0) 
-    else: labelshape2 = None
+        labelbg = ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=thickness,zorder=0) 
+    else: labelbg = None
 
-    labelshape = ax.text(x3,y3,s=str(weight),
+    labeltext = ax.text(x3,y3,s=("" if flow==0 else (str(flow)+"/")) + str(weight),
                          horizontalalignment='center',verticalalignment='center', size=textsize)
 
-    return shape, labelshape, labelshape2
+    return shape, labeltext, labelbg
 
 def points_on_line_(p,q,pos,dist,bend=0):
     '''
@@ -350,7 +361,7 @@ def loadgraph(jsonname):
 
 '''Decorator'''
 
-def activatebutt(butt):
+def activatebutt(butt, numnodes):
 
     def f(func):
         
@@ -358,11 +369,11 @@ def activatebutt(butt):
 
             global clickqueue, mission
 
-            if len(clickqueue)==0:
+            if len(clickqueue)<numnodes:
                 print("Pick a source node first!")
                 return
 
-            mission = func(adjmat, nodeset[clickqueue[-1]]) 
+            mission = func(adjmat, *[nodeset[clickqueue[u]] for u in range(-numnodes,0)]) 
             clickqueue = []
             nextstep(x)
 
@@ -377,7 +388,7 @@ def activatebutt(butt):
 
 bfsbutt = Button(plt.axes([0.8, 0, 0.1, 0.05]), "\\textbf{BFS}", image=None, color='0.85', hovercolor='0.95')
 
-@activatebutt(bfsbutt)
+@activatebutt(bfsbutt,1)
 def bfs(adj, source):
     visited = {source}
     levels = [{source}]
@@ -399,7 +410,7 @@ def bfs(adj, source):
 
 dfsbutt = Button(plt.axes([0.7, 0, 0.1, 0.05]), "\\textbf{DFS}", image=None, color='0.85', hovercolor='0.95')
 
-@activatebutt(dfsbutt)
+@activatebutt(dfsbutt,1)
 def dfs(graph, source):
     visited = {source}
     stack = [(source,)]
@@ -423,7 +434,7 @@ def dfs(graph, source):
 
 dijksbutt = Button(plt.axes([0.55, 0, 0.15, 0.05]), "\\textbf{Dijkstra}", image=None, color='0.85', hovercolor='0.95')
 
-@activatebutt(dijksbutt)
+@activatebutt(dijksbutt,1)
 def dijkstra(graph, source):
 
     def extractmin(dictionary):
@@ -463,6 +474,74 @@ def dijkstra(graph, source):
         yield nodeyield + [(e,)] if foundedge else nodeyield
 
         del fakedist[popped]
+
+
+'''Edmonds-Karp'''
+
+karpbutt = Button(plt.axes([0.40, 0, 0.15, 0.05]), "\\textbf{Edmonds-Karp}", image=None, color='0.85', hovercolor='0.95')
+
+@activatebutt(karpbutt,2)
+def edmondskarp(graph, source, terminal):
+    
+    def augmentingpath(graph):
+        resgraph = {v: [] for v in graph}
+        for _,nbs in graph.items():
+            for _,e in nbs:
+                if e.flowvalue > 0:
+                    resgraph[e.end].append((e.start, e.flowvalue, e, "opp"))
+                if e.flowvalue < e.weight:
+                    resgraph[e.start].append((e.end, e.weight-e.flowvalue, e, "par"))
+        
+        visited = {source: (0,None,None,None)}
+        levels = [{source}]
+        cur_level = 0
+
+        while levels[cur_level]:
+            levels.append(set())
+            for now in levels[cur_level]:
+                for nb,f,ed,d in resgraph[now]:
+                    if nb not in visited:
+                        visited[nb] = (cur_level+1, f,ed,d)
+                        levels[cur_level+1].add(nb)
+            cur_level+=1
+        
+        if terminal not in visited: return None
+        else:
+            ans = []
+            parent = terminal
+            while parent != source:
+                _,f,ed,d = visited[parent]
+                ans.append((f,ed,d))
+                if d == "opp":
+                    parent = ed.end
+                else:
+                    parent = ed.start
+
+        return [x[1:3] for x in ans], min(ans, key = lambda x: x[0])[0]
+
+    ag = augmentingpath(graph)
+
+    while ag is not None:
+
+        to_yield = set()
+        for e,stat in ag[0]:
+
+            e.changeflow(e.flowvalue + (ag[1]) * (1 if stat == "par" else -1))   
+
+            to_yield.add((e,))
+            to_yield.add((e.start,))
+            to_yield.add((e.end,))
+
+        yield list(to_yield)
+
+        for e,stat in ag[0]:
+
+            e.highlight(False)
+            e.start.highlight(False)
+            e.end.highlight(False) 
+
+        ag = augmentingpath(graph)  
+
 
 
 ##########################
@@ -537,7 +616,10 @@ def process_input():
             fv, bn, ar, we = 0, 0, defaultarrow, ""
             for prop in splitinput:
                 if "f=" in prop:
-                    fv = float(prop[2:])
+                    try:
+                        fv = int(prop[2:])
+                    except:
+                        fv = float(prop[2:])
                 if "b=" in prop:
                     bn = float(prop[2:])
                 if prop=="und":
@@ -565,9 +647,9 @@ def process_input():
                 for e in edgeset[edgecoord]:
                     e.shape.set_positions(coord1, edgecoord[1])
                     xm, ym = bent_midpoint(coord1, edgecoord[1], e.bend)
-                    e.labelshape.set(x=xm, y=ym)
-                    if e.labelshape2 is not None:
-                        e.labelshape2.set_offsets(np.array([[xm,ym]]))
+                    e.labeltext.set(x=xm, y=ym)
+                    if e.labelbg is not None:
+                        e.labelbg.set_offsets(np.array([[xm,ym]]))
                 edgeset[(coord1, edgecoord[1])] = edgeset[edgecoord]
                 del edgeset[edgecoord]
                 
@@ -575,9 +657,9 @@ def process_input():
                 for e in edgeset[edgecoord]:
                     e.shape.set_positions(edgecoord[0], coord1)
                     xm, ym = bent_midpoint(edgecoord[0], coord1, e.bend)
-                    e.labelshape.set(x=xm, y=ym)
-                    if e.labelshape2 is not None:
-                        e.labelshape2.set_offsets(np.array([[xm,ym]]))
+                    e.labeltext.set(x=xm, y=ym)
+                    if e.labelbg is not None:
+                        e.labelbg.set_offsets(np.array([[xm,ym]]))
                 edgeset[(edgecoord[0], coord1)] = edgeset[edgecoord]
                 del edgeset[edgecoord]
 
@@ -625,15 +707,10 @@ fig.canvas.mpl_connect('key_press_event', onkey)
 
 
 def update(frame):
-    if showflow:
-        for _,edges in edgeset.items():
-            for edge in edges:
-                edge.flowdots.set_visible(True)
-                edge.dispflow(frame*velocityscale)
-    else:
-        for _,edges in edgeset.items():
-            for edge in edges:
-                edge.flowdots.set_visible(False)
+    for _,edges in edgeset.items():
+        for edge in edges:
+            edge.dispflow(frame*velocityscale, showflow)
+            edge.showweight(not showflow)
 
 ani = anime.FuncAnimation(fig=fig, func=update, frames=1000, interval=30)
 
