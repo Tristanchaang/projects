@@ -13,7 +13,8 @@ margin = 2 # amount of white space from border, default 2
 velocityscale = 0.01 # speed of flow dots, default 0.01
 thickness = 1 # thickness of lines, default 1
 nodebg = "white" # node color, default "white"
-loadfilename = "bfs" # name of saved graph, without .json
+H, W = 6, 12 # dimensions of window, default 6,12
+loadfilename = "edmonds" # name of saved graph, without .json
 ##################################
 
 '''
@@ -102,8 +103,9 @@ if not os.path.exists(relpath('saved_graphs')):
 
 # activate LaTeX
 plt.rcParams.update({
-    "text.usetex": True,
-    "font.family": "TeX",
+    "text.usetex": False,
+    'mathtext.fontset': 'stix',
+    "font.family": 'STIXGeneral',
     "font.monospace": 'Computer Modern Typewriter'
 })
 
@@ -116,7 +118,7 @@ for param, shortcuts in plt.rcParams.items():
 
 # create figure
 fig, ax = plt.subplots()
-fig.set(figheight=6, figwidth=15) # dimensions of window
+fig.set(figheight=H, figwidth=W) # dimensions of window
 
 nodeset = {} # maps node coordinates to node objects
 edgeset = {} # maps edge coordinate pairs to edge objects
@@ -301,7 +303,7 @@ def reshape_diagram():
 
 '''Toggle Flow'''
 
-butt = Button(plt.axes([0, 0, 0.2, 0.05]), "\\textbf{Toggle Flow}", image=None, color='0.85', hovercolor='0.95')
+butt = Button(plt.axes([0, 0, 0.2, 0.05]), "$\\mathbf{Toggle\\ Flow}$", image=None, color='0.85', hovercolor='0.95')
 showflow = False
 
 def toggleflow(_):
@@ -312,7 +314,7 @@ butt.on_clicked(toggleflow)
 
 '''Next'''
 
-nextbutt = Button(plt.axes([0.9, 0, 0.1, 0.05]), "\\textbf{Next}", image=None, color='0.85', hovercolor='0.95')
+nextbutt = Button(plt.axes([0.9, 0, 0.1, 0.05]), "$\\mathbf{Next}$", image=None, color='0.85', hovercolor='0.95')
 mission = None
 
 def nextstep(_):
@@ -333,7 +335,7 @@ nextbutt.on_clicked(nextstep)
 
 '''Save'''
 
-savebutt = Button(plt.axes([0.2, 0, 0.1, 0.05]), "\\textbf{Save}", image=None, color='0.85', hovercolor='0.95')
+savebutt = Button(plt.axes([0.2, 0, 0.1, 0.05]), "$\\mathbf{Save}$", image=None, color='0.85', hovercolor='0.95')
 
 def savegraph(_):
     global inputstatus
@@ -395,21 +397,21 @@ def activatebutt(butt, numnodes):
 
 '''BFS'''
 
-bfsbutt = Button(plt.axes([0.8, 0, 0.1, 0.05]), "\\textbf{BFS}", image=None, color='0.85', hovercolor='0.95')
+bfsbutt = Button(plt.axes([0.8, 0, 0.1, 0.05]), "$\\mathbf{BFS}$", image=None, color='0.85', hovercolor='0.95')
 
 @activatebutt(bfsbutt,1)
 def bfs(adj, source):
     visited = {source}
     levels = [{source}]
     cur_level = 0
-    yield [(source,"\\textbf{"+str(cur_level)+"}")]
+    yield [(source,"$\\mathbf{"+str(cur_level)+"}$")]
     while True:
         levels.append(set())
         if levels[cur_level] == set(): break
         for v in levels[cur_level]:
             for nb,e in adj[v]:
                 if nb not in visited:
-                    yield [(e,),(nb,"\\textbf{"+str(cur_level+1)+"}")]
+                    yield [(e,),(nb,"$\\mathbf{"+str(cur_level+1)+"}$")]
                     visited.add(nb)
                     levels[cur_level+1].add(nb)
         cur_level += 1
@@ -417,7 +419,7 @@ def bfs(adj, source):
 
 '''DFS'''
 
-dfsbutt = Button(plt.axes([0.7, 0, 0.1, 0.05]), "\\textbf{DFS}", image=None, color='0.85', hovercolor='0.95')
+dfsbutt = Button(plt.axes([0.7, 0, 0.1, 0.05]), "$\\mathbf{DFS}$", image=None, color='0.85', hovercolor='0.95')
 
 @activatebutt(dfsbutt,1)
 def dfs(graph, source):
@@ -441,7 +443,7 @@ def dfs(graph, source):
 
 '''Dijkstra'''
 
-dijksbutt = Button(plt.axes([0.55, 0, 0.15, 0.05]), "\\textbf{Dijkstra}", image=None, color='0.85', hovercolor='0.95')
+dijksbutt = Button(plt.axes([0.55, 0, 0.15, 0.05]), "$\\mathbf{Dijkstra}$", image=None, color='0.85', hovercolor='0.95')
 
 @activatebutt(dijksbutt,1)
 def dijkstra(graph, source):
@@ -478,7 +480,7 @@ def dijkstra(graph, source):
                     break
             if foundedge: break
 
-        nodeyield = [(popped,"\\textbf{"+str(poppeddist)+"}")]
+        nodeyield = [(popped,"$\\mathbf{"+str(poppeddist)+"}$")]
 
         yield nodeyield + [(e,)] if foundedge else nodeyield
 
@@ -487,7 +489,7 @@ def dijkstra(graph, source):
 
 '''Edmonds-Karp'''
 
-karpbutt = Button(plt.axes([0.40, 0, 0.15, 0.05]), "\\textbf{Edmonds-Karp}", image=None, color='0.85', hovercolor='0.95')
+karpbutt = Button(plt.axes([0.40, 0, 0.15, 0.05]), "$\\mathbf{Edmonds}$-$\\mathbf{Karp}$", image=None, color='0.85', hovercolor='0.95')
 
 @activatebutt(karpbutt,2)
 def edmondskarp(graph, source, terminal):
@@ -764,5 +766,4 @@ but you can save it and then reload it as a new graph, then they are removeable.
 reshape_diagram()
 
 plt.show()
-fig.show()
 # ani.save(filename="graph.gif", writer="pillow")
