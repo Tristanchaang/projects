@@ -82,6 +82,7 @@ RUNNING A BFS/DFS/Dijkstra:
 RUNNING Edmonds-Karp:
 - Click the source node and the terminal node, then click Edmonds-Karp. Same as above.
 - Toggle on/off flow to see it from different perspectives!
+** Note ** Edmonds-Karp only works for directed graphs.
 
 ADDITIONAL COMMANDS:
 - und: Makes plotting edges undirected by default
