@@ -104,7 +104,7 @@ if not os.path.exists(relpath('saved_graphs')):
 # activate LaTeX
 plt.rcParams.update({
     "text.usetex": False,
-    'mathtext.fontset': 'stix',
+    'mathtext.fontset': 'cm',
     "font.family": 'STIXGeneral',
     "font.monospace": 'Computer Modern Typewriter'
 })
