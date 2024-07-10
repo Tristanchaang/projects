@@ -378,7 +378,8 @@ def activatebutt(butt, numnodes):
             global clickqueue, mission
 
             if len(clickqueue)<numnodes:
-                print("Pick a source node first!")
+                if numnodes == 1: print("Pick a source node!")
+                if numnodes == 2: print("Pick a source node and a terminal node!")
                 return
 
             mission = func(adjmat, *[nodeset[clickqueue[u]] for u in range(-numnodes,0)]) 
