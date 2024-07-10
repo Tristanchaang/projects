@@ -159,7 +159,7 @@ class node:
                       c="red")
 
     def lowlight(self, boo, write="", color="black"):
-        self.mask.set(text=write if boo else "",
+        self.mask.set(text=("$"+write+"$") if boo else "",
                       x=self.coord[0],
                       y=self.coord[1] + 0.6 * noderad * (self.yrange[1]-self.yrange[0])/fig.get_figheight(),
                       c=color)
@@ -226,7 +226,7 @@ class edge:
 
     def changeflow(self, newvalue):
         self.flowvalue = newvalue
-        self.labeltext.set(text=("" if self.flowvalue==0 else (str(self.flowvalue)+"/")) + str(self.weight))
+        self.labeltext.set(text="$" + ("" if self.flowvalue==0 else (str(self.flowvalue)+"/")) + str(self.weight) + "$")
 
     def showweight(self, boo):
         if self.labelbg is not None: self.labelbg.set_visible(boo)
@@ -270,7 +270,7 @@ def arrow_(p,q,weight,bend,arrow, flow):
         labelbg = ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=thickness,zorder=0)
     else: labelbg = None
 
-    labeltext = ax.text(x3,y3,s=("" if flow==0 else (str(flow)+"/")) + str(weight),
+    labeltext = ax.text(x3,y3,s="$" + ("" if flow==0 else (str(flow)+"/")) + str(weight) + "$",
                          horizontalalignment='center',verticalalignment='center', size=textsize)
 
     return shape, labeltext, labelbg
@@ -455,7 +455,7 @@ def dijkstra(graph, source):
     fakedist[source] = 0
 
     for n in fakedist:
-        n.lowlight(True, "$\\infty$" if fakedist[n] == float("inf") else str(fakedist[n]), "blue")
+        n.lowlight(True, "\\infty" if fakedist[n] == float("inf") else str(fakedist[n]), "blue")
 
     truedist = {}
 
@@ -469,7 +469,7 @@ def dijkstra(graph, source):
             if nb in fakedist:
                 fakedist[nb] = min(fakedist[nb], poppeddist + (e.weight if e.weight!="" else 0))
                 nb.lowlight(True,
-                            "$\\infty$" if fakedist[nb] == float("inf") else str(fakedist[nb]),
+                            "\\infty" if fakedist[nb] == float("inf") else str(fakedist[nb]),
                             "blue")
 
         foundedge = False
