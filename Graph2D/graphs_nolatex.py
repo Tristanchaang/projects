@@ -226,7 +226,7 @@ class edge:
 
     def changeflow(self, newvalue):
         self.flowvalue = newvalue
-        self.labeltext.set(text="$" + ("" if self.flowvalue==0 else (str(self.flowvalue)+"/")) + str(self.weight) + "$")
+        self.labeltext.set(text=("" if self.flowvalue==0 else (str(self.flowvalue)+"/")) + str(self.weight))
 
     def showweight(self, boo):
         if self.labelbg is not None: self.labelbg.set_visible(boo)
@@ -270,7 +270,7 @@ def arrow_(p,q,weight,bend,arrow, flow):
         labelbg = ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=thickness,zorder=0)
     else: labelbg = None
 
-    labeltext = ax.text(x3,y3,s="$" + ("" if flow==0 else (str(flow)+"/")) + str(weight) + "$",
+    labeltext = ax.text(x3,y3,s=("" if flow==0 else (str(flow)+"/")) + str(weight),
                          horizontalalignment='center',verticalalignment='center', size=textsize)
 
     return shape, labeltext, labelbg
