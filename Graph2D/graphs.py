@@ -108,7 +108,7 @@ if not os.path.exists(relpath('saved_graphs')):
 plt.rcParams.update({
     "text.usetex": LaTeX,
     'mathtext.fontset': 'cm',
-    "font.family": "TeX" if LaTeX else "STIXGeneral",
+    "font.family": "STIXGeneral",
     "font.monospace": 'Computer Modern Typewriter'
 })
 
@@ -128,6 +128,7 @@ edgeset = {} # maps edge coordinate pairs to edge objects
 adjmat = {} # maps each node object n to a list [(nb,e), ...] where e is the edge from n to nb
 
 class node:
+
     xrange = [-2, 2] # for diagram dimensions
     yrange = [-2, 2]
 
@@ -304,13 +305,11 @@ def reshape_diagram():
 ############################
 
 
-def butt(buttname, xpos, xsize):
-    if LaTeX:
-        realname = "\\textbf{" + buttname + "}"
-    else:
-        realname = "$\\mathbf{" + "\\ ".join(buttname.split(" ")) + "}$"
+def boldface(string):
+    return "\\textbf{" + string + "}" if LaTeX else "$\\mathbf{" + "\\ ".join(string.split(" ")) + "}$"
 
-    return Button(plt.axes([xpos, 0, xsize, 0.05]), realname, image=None, color='0.85', hovercolor='0.95')
+def butt(buttname, xpos, xsize, buttimage=None):
+    return Button(plt.axes([xpos, 0, xsize, 0.05]), boldface(buttname), image=buttimage, color='0.85', hovercolor='0.95')
 
 
 '''Toggle Flow'''
@@ -381,7 +380,7 @@ def loadgraph(jsonname):
     reshape_diagram()
 
 
-'''Decorator'''
+'''Decorator for Algorithms'''
 
 def activatebutt(butt, numnodes):
 
@@ -416,14 +415,14 @@ def bfs(adj, source):
     visited = {source}
     levels = [{source}]
     cur_level = 0
-    yield [(source,"\\textbf{"+str(cur_level)+"}")]
+    yield [(source,boldface(str(cur_level)))]
     while True:
         levels.append(set())
         if levels[cur_level] == set(): break
         for v in levels[cur_level]:
             for nb,e in adj[v]:
                 if nb not in visited:
-                    yield [(e,),(nb,"\\textbf{"+str(cur_level+1)+"}")]
+                    yield [(e,),(nb,boldface(str(cur_level+1)))]
                     visited.add(nb)
                     levels[cur_level+1].add(nb)
         cur_level += 1
@@ -492,7 +491,7 @@ def dijkstra(graph, source):
                     break
             if foundedge: break
 
-        nodeyield = [(popped,"\\textbf{"+str(poppeddist)+"}")]
+        nodeyield = [(popped,boldface(str(poppeddist)))]
 
         yield nodeyield + [(e,)] if foundedge else nodeyield
 
@@ -501,7 +500,7 @@ def dijkstra(graph, source):
 
 '''Edmonds-Karp'''
 
-karpbutt = butt("Edmonds"+ u"\u2010" +"Karp", 0.4, 0.15)
+karpbutt = butt("Edmonds"+ u"\u2010" +"Karp", 0.4, 0.15) # u"\u2010" is unicode for hyphen
 
 @activatebutt(karpbutt,2)
 def edmondskarp(graph, source, terminal):
