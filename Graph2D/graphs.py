@@ -308,13 +308,13 @@ def reshape_diagram():
 def boldface(string):
     return "\\textbf{" + string + "}" if LaTeX else "$\\mathbf{" + "\\ ".join(string.split(" ")) + "}$"
 
-def butt(buttname, xpos, xsize):
+def newbutt(buttname, xpos, xsize):
     return Button(plt.axes([xpos, 0, xsize, 0.05]), boldface(buttname), image=None, color='0.85', hovercolor='0.95')
 
 
 '''Toggle Flow'''
 
-flowbutt = butt("Toggle Flow", 0, 0.2)
+flowbutt = newbutt("Toggle Flow", 0, 0.1)
 showflow = False
 
 def toggleflow(_):
@@ -323,30 +323,9 @@ def toggleflow(_):
 flowbutt.on_clicked(toggleflow)
 
 
-'''Next'''
-
-nextbutt = butt("Next", 0.9, 0.1)
-mission = None
-
-def nextstep(_):
-    global clickqueue
-    try: new = next(mission)
-    except:
-        for _,es in edgeset.items():
-            for e in es:
-                e.highlight(False)
-        for _,n in nodeset.items():
-            n.highlight(False)
-        return
-    for obj in new:
-        obj[0].highlight(True, *obj[1:])
-    clickqueue = []
-nextbutt.on_clicked(nextstep)
-
-
 '''Save'''
 
-savebutt = butt("Save", 0.2, 0.1)
+savebutt = newbutt("Save", 0.1, 0.1)
 
 def savegraph(_):
     global inputstatus
@@ -380,6 +359,27 @@ def loadgraph(jsonname):
     reshape_diagram()
 
 
+'''Next'''
+
+nextbutt = newbutt("Next", 0.9, 0.1)
+mission = None
+
+def nextstep(_):
+    global clickqueue
+    try: new = next(mission)
+    except:
+        for _,es in edgeset.items():
+            for e in es:
+                e.highlight(False)
+        for _,n in nodeset.items():
+            n.highlight(False)
+        return
+    for obj in new:
+        obj[0].highlight(True, *obj[1:])
+    clickqueue = []
+nextbutt.on_clicked(nextstep)
+
+
 '''Decorator for Algorithms'''
 
 def activatebutt(butt, numnodes):
@@ -408,7 +408,7 @@ def activatebutt(butt, numnodes):
 
 '''BFS'''
 
-bfsbutt = butt("BFS", 0.8, 0.1)
+bfsbutt = newbutt("BFS", 0.8, 0.1)
 
 @activatebutt(bfsbutt,1)
 def bfs(adj, source):
@@ -430,7 +430,7 @@ def bfs(adj, source):
 
 '''DFS'''
 
-dfsbutt = butt("DFS", 0.7, 0.1)
+dfsbutt = newbutt("DFS", 0.7, 0.1)
 
 @activatebutt(dfsbutt,1)
 def dfs(graph, source):
@@ -454,7 +454,7 @@ def dfs(graph, source):
 
 '''Dijkstra'''
 
-dijksbutt = butt("Dijkstra", 0.55, 0.15)
+dijksbutt = newbutt("Dijkstra", 0.6, 0.1)
 
 @activatebutt(dijksbutt,1)
 def dijkstra(graph, source):
@@ -500,7 +500,7 @@ def dijkstra(graph, source):
 
 '''Edmonds-Karp'''
 
-karpbutt = butt("Edmonds"+ u"\u2010" +"Karp", 0.4, 0.15) # u"\u2010" is unicode for hyphen
+karpbutt = newbutt("Edmonds"+ u"\u2010" +"Karp", 0.5, 0.1) # u"\u2010" is unicode for hyphen
 
 @activatebutt(karpbutt,2)
 def edmondskarp(graph, source, terminal):
