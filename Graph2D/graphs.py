@@ -501,7 +501,7 @@ def dijkstra(graph, source):
 
 '''Edmonds-Karp'''
 
-karpbutt = butt("Edmonds-Karp", 0.4, 0.15)
+karpbutt = butt("Edmonds"+ u"\u2010" +"Karp", 0.4, 0.15)
 
 @activatebutt(karpbutt,2)
 def edmondskarp(graph, source, terminal):
@@ -511,15 +511,11 @@ def edmondskarp(graph, source, terminal):
 
         resgraph = {v: [] for v in graph}
         for _,nbs in graph.items():
-            print("balls", nbs)
             for _,e in nbs:
-                print("bells", nbs)
                 if e.flowvalue > 0:
                     resgraph[e.end].append((e.start, e.flowvalue, e, "opp"))
-                    print("bulls", nbs)
                 if e.flowvalue < e.weight:
                     resgraph[e.start].append((e.end, e.weight-e.flowvalue, e, "par"))
-                    print("bills", nbs)
 
         visited = {source: (0,None,None,None)}
         levels = [{source}]
