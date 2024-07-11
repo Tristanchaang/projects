@@ -506,7 +506,6 @@ karpbutt = butt("Edmonds"+ u"\u2010" +"Karp", 0.4, 0.15)
 @activatebutt(karpbutt,2)
 def edmondskarp(graph, source, terminal):
 
-
     def augmentingpath(graph):
 
         resgraph = {v: [] for v in graph}
