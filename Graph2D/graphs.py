@@ -7,13 +7,16 @@ from matplotlib import colors
 from matplotlib.widgets import Button
 
 ########### Parameters ###########
+LaTeX = True # Only activate this if your computer has LaTeX installed on your path
+loadfilename = "" # name of saved graph, without .json
+
 noderad = 0.6 # radius of the nodes, default 0.6
 textsize = 15 # size of labels, default 15
 margin = 2 # amount of white space from border, default 2
 velocityscale = 0.01 # speed of flow dots, default 0.01
 thickness = 1 # thickness of lines, default 1
 nodebg = "white" # node color, default "white"
-loadfilename = "bfs" # name of saved graph, without .json
+H, W = 6, 12 # window dimensions
 ##################################
 
 '''
@@ -101,10 +104,11 @@ relpath = lambda x: os.path.join(cur_dir, x)
 if not os.path.exists(relpath('saved_graphs')):
     os.makedirs(relpath('saved_graphs'))
 
-# activate LaTeX
+# font setting
 plt.rcParams.update({
-    "text.usetex": True,
-    "font.family": "TeX",
+    "text.usetex": LaTeX,
+    'mathtext.fontset': 'cm',
+    "font.family": "TeX" if LaTeX else "STIXGeneral",
     "font.monospace": 'Computer Modern Typewriter'
 })
 
@@ -117,7 +121,7 @@ for param, shortcuts in plt.rcParams.items():
 
 # create figure
 fig, ax = plt.subplots()
-fig.set(figheight=6, figwidth=15) # dimensions of window
+fig.set(figheight=H, figwidth=W) # dimensions of window
 
 nodeset = {} # maps node coordinates to node objects
 edgeset = {} # maps edge coordinate pairs to edge objects
@@ -300,20 +304,29 @@ def reshape_diagram():
 ############################
 
 
+def butt(buttname, xpos, xsize):
+    if LaTeX:
+        realname = "\\textbf{" + buttname + "}"
+    else:
+        realname = "$\\mathbf{" + "\\ ".join(buttname.split(" ")) + "}$"
+
+    return Button(plt.axes([xpos, 0, xsize, 0.05]), realname, image=None, color='0.85', hovercolor='0.95')
+
+
 '''Toggle Flow'''
 
-butt = Button(plt.axes([0, 0, 0.2, 0.05]), "\\textbf{Toggle Flow}", image=None, color='0.85', hovercolor='0.95')
+flowbutt = butt("Toggle Flow", 0, 0.2)
 showflow = False
 
 def toggleflow(_):
     global showflow
     showflow = not showflow
-butt.on_clicked(toggleflow)
+flowbutt.on_clicked(toggleflow)
 
 
 '''Next'''
 
-nextbutt = Button(plt.axes([0.9, 0, 0.1, 0.05]), "\\textbf{Next}", image=None, color='0.85', hovercolor='0.95')
+nextbutt = butt("Next", 0.9, 0.1)
 mission = None
 
 def nextstep(_):
@@ -334,7 +347,7 @@ nextbutt.on_clicked(nextstep)
 
 '''Save'''
 
-savebutt = Button(plt.axes([0.2, 0, 0.1, 0.05]), "\\textbf{Save}", image=None, color='0.85', hovercolor='0.95')
+savebutt = butt("Save", 0.2, 0.1)
 
 def savegraph(_):
     global inputstatus
@@ -396,7 +409,7 @@ def activatebutt(butt, numnodes):
 
 '''BFS'''
 
-bfsbutt = Button(plt.axes([0.8, 0, 0.1, 0.05]), "\\textbf{BFS}", image=None, color='0.85', hovercolor='0.95')
+bfsbutt = butt("BFS", 0.8, 0.1)
 
 @activatebutt(bfsbutt,1)
 def bfs(adj, source):
@@ -418,7 +431,7 @@ def bfs(adj, source):
 
 '''DFS'''
 
-dfsbutt = Button(plt.axes([0.7, 0, 0.1, 0.05]), "\\textbf{DFS}", image=None, color='0.85', hovercolor='0.95')
+dfsbutt = butt("DFS", 0.7, 0.1)
 
 @activatebutt(dfsbutt,1)
 def dfs(graph, source):
@@ -442,7 +455,7 @@ def dfs(graph, source):
 
 '''Dijkstra'''
 
-dijksbutt = Button(plt.axes([0.55, 0, 0.15, 0.05]), "\\textbf{Dijkstra}", image=None, color='0.85', hovercolor='0.95')
+dijksbutt = butt("Dijkstra", 0.55, 0.15)
 
 @activatebutt(dijksbutt,1)
 def dijkstra(graph, source):
@@ -488,19 +501,25 @@ def dijkstra(graph, source):
 
 '''Edmonds-Karp'''
 
-karpbutt = Button(plt.axes([0.40, 0, 0.15, 0.05]), "\\textbf{Edmonds-Karp}", image=None, color='0.85', hovercolor='0.95')
+karpbutt = butt("Edmonds-Karp", 0.4, 0.15)
 
 @activatebutt(karpbutt,2)
 def edmondskarp(graph, source, terminal):
 
+
     def augmentingpath(graph):
+
         resgraph = {v: [] for v in graph}
         for _,nbs in graph.items():
+            print("balls", nbs)
             for _,e in nbs:
+                print("bells", nbs)
                 if e.flowvalue > 0:
                     resgraph[e.end].append((e.start, e.flowvalue, e, "opp"))
+                    print("bulls", nbs)
                 if e.flowvalue < e.weight:
                     resgraph[e.start].append((e.end, e.weight-e.flowvalue, e, "par"))
+                    print("bills", nbs)
 
         visited = {source: (0,None,None,None)}
         levels = [{source}]
@@ -693,6 +712,8 @@ def process_input():
 
 def onclick(event):
     global clickqueue
+    if event.xdata is None or event.ydata is None:
+        return
     x,y = round(event.xdata), round(event.ydata)
     if event.inaxes.get_position().bounds[1] != 0:
         clickqueue.append((x,y))
@@ -757,6 +778,39 @@ but you can save it and then reload it as a new graph, then they are removeable.
 # for i in range(N):
 #     for j in range(i+1,N):
 #         edge(tenrings[i],tenrings[j],arrow=False)
+
+
+
+spacing = 7
+
+allowed = {(1,1),(1,3),(1,6),
+             (2,1),(2,7),
+             (3,1),(3,2),(3,5),
+             (4,6),
+             (5,4),(5,7),
+             (6,1),(6,2),(6,8),
+             (7,4),
+             (8,4),(8,6),
+             (9,1),(9,3),
+             (10,7)}
+
+node(0,0,"$s$")
+node(3*spacing,0,"$t$")
+
+for i in range(1,11):
+    node(spacing, 11-2*i, "$c_{"+str(i)+"}$")
+    edge(nodeset[0,0], nodeset[spacing, 11-2*i], weight=1, bend=-0.03 * (11-2*i))
+
+for i in range(1,9):
+    node(2*spacing, 9-2*i, "$r_"+str(i)+"$")
+    edge(nodeset[2*spacing, 9-2*i], nodeset[3*spacing, 0], weight=1, bend=-0.03 * (11-2*i))
+
+for i in range(1,11):
+    for j in range(1,9):
+        if (i,j) in allowed:
+            edge(nodeset[spacing,11-2*i], nodeset[2*spacing, 9-2*j], weight=1, bend=0)
+
+
 
 ################
 ################
