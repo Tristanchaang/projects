@@ -308,8 +308,8 @@ def reshape_diagram():
 def boldface(string):
     return "\\textbf{" + string + "}" if LaTeX else "$\\mathbf{" + "\\ ".join(string.split(" ")) + "}$"
 
-def butt(buttname, xpos, xsize, buttimage=None):
-    return Button(plt.axes([xpos, 0, xsize, 0.05]), boldface(buttname), image=buttimage, color='0.85', hovercolor='0.95')
+def butt(buttname, xpos, xsize):
+    return Button(plt.axes([xpos, 0, xsize, 0.05]), boldface(buttname), image=None, color='0.85', hovercolor='0.95')
 
 
 '''Toggle Flow'''
