@@ -8,7 +8,7 @@ from matplotlib.widgets import Button
 
 ########### Parameters ###########
 LaTeX = True # Activate only if your computer has LaTeX installed on PATH
-loadfilename = "rookproblem" # name of saved graph, without .json
+loadfilename = "flownetworkemp" # name of saved graph, without .json
 
 noderad = 0.6 # radius of the nodes, default 0.6
 textsize = 15 # size of labels, default 15
@@ -230,7 +230,8 @@ class edge:
 
     def changeflow(self, newvalue):
         self.flowvalue = newvalue
-        self.labeltext.set(text=("" if self.flowvalue==0 else (str(self.flowvalue)+"/")) + str(self.weight))
+        self.labeltext.set(text=("" if self.flowvalue==0 else (str(self.flowvalue)+"/")) +
+                            texify(self.weight))
 
     def showweight(self, boo):
         if self.labelbg is not None: self.labelbg.set_visible(boo)
@@ -255,6 +256,16 @@ def bent_midpoint(coord1, coord2, bend):
     disp = np.array([[0,1],[-1,0]]) @ np.array([[x2-x1],[y2-y1]]) * bend * 0.5
     return list((disp+np.array([[(x1+x2)/2],[(y1+y2)/2]])).flatten())
 
+
+def texify(number):
+    if number == float("inf"):
+        return "$\\infty$"
+    elif number == float("-inf"):
+        return "$-\\infty$"
+    else:
+        return str(number)
+
+
 def arrow_(p,q,weight,bend,arrow, flow):
     '''draws arrow'''
     x1, y1 = p
@@ -274,7 +285,7 @@ def arrow_(p,q,weight,bend,arrow, flow):
         labelbg = ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=thickness,zorder=0)
     else: labelbg = None
 
-    labeltext = ax.text(x3,y3,s=("" if flow==0 else (str(flow)+"/")) + str(weight),
+    labeltext = ax.text(x3,y3,s=("" if flow==0 else (str(flow)+"/")) + texify(weight),
                          horizontalalignment='center',verticalalignment='center', size=textsize)
 
     return shape, labeltext, labelbg
@@ -527,7 +538,7 @@ def edmondskarp(graph, source, terminal):
                         levels[cur_level+1].add(nb)
             cur_level+=1
 
-        if terminal not in visited: return None
+        if terminal not in visited: return (None,None)
         else:
             ans = []
             parent = terminal
@@ -541,28 +552,32 @@ def edmondskarp(graph, source, terminal):
 
         return [x[1:3] for x in ans], min(ans, key = lambda x: x[0])[0]
 
-    ag = augmentingpath(graph)
+    agpath, bottleneck = augmentingpath(graph)
+    curflow = 0
 
-    while ag is not None:
+    while agpath is not None:
 
         to_yield = set()
-        for e,stat in ag[0]:
+        for e,stat in agpath:
 
-            e.changeflow(e.flowvalue + (ag[1]) * (1 if stat == "par" else -1))
+            e.changeflow(e.flowvalue + (bottleneck) * (1 if stat == "par" else -1))
 
             to_yield.add((e,))
             to_yield.add((e.start,))
             to_yield.add((e.end,))
 
+        curflow += bottleneck
+        print("Current Flow:", curflow)
+
         yield list(to_yield)
 
-        for e,stat in ag[0]:
+        for e,stat in agpath:
 
             e.highlight(False)
             e.start.highlight(False)
             e.end.highlight(False)
 
-        ag = augmentingpath(graph)
+        agpath, bottleneck = augmentingpath(graph)
 
 
 ##########################
