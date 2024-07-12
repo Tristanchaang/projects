@@ -7,8 +7,8 @@ from matplotlib import colors
 from matplotlib.widgets import Button
 
 ########### Parameters ###########
-LaTeX = True # Only activate this if your computer has LaTeX installed on your path
-loadfilename = "" # name of saved graph, without .json
+LaTeX = True # Activate only if your computer has LaTeX installed on PATH
+loadfilename = "rookproblem" # name of saved graph, without .json
 
 noderad = 0.6 # radius of the nodes, default 0.6
 textsize = 15 # size of labels, default 15
@@ -773,34 +773,34 @@ but you can save it and then reload it as a new graph, then they are removeable.
 #         edge(tenrings[i],tenrings[j],arrow=False)
 
 
-spacing = 7
+# spacing = 7
 
-allowed = {(1,1),(1,3),(1,6),
-             (2,1),(2,7),
-             (3,1),(3,2),(3,5),
-             (4,6),
-             (5,4),(5,7),
-             (6,1),(6,2),(6,8),
-             (7,4),
-             (8,4),(8,6),
-             (9,1),(9,3),
-             (10,7)}
+# allowed = {(1,1),(1,3),(1,6),
+#              (2,1),(2,7),
+#              (3,1),(3,2),(3,5),
+#              (4,6),
+#              (5,4),(5,7),
+#              (6,1),(6,2),(6,8),
+#              (7,4),
+#              (8,4),(8,6),
+#              (9,1),(9,3),
+#              (10,7)}
 
-node(0,0,"$s$")
-node(3*spacing,0,"$t$")
+# node(0,0,"$s$")
+# node(3*spacing,0,"$t$")
 
-for i in range(1,11):
-    node(spacing, 11-2*i, "$c_{"+str(i)+"}$")
-    edge(nodeset[0,0], nodeset[spacing, 11-2*i], weight=1, bend=-0.03 * (11-2*i))
+# for i in range(1,11):
+#     node(spacing, 11-2*i, "$c_{"+str(i)+"}$")
+#     edge(nodeset[0,0], nodeset[spacing, 11-2*i], weight=1, bend=-0.03 * (11-2*i))
 
-for i in range(1,9):
-    node(2*spacing, 9-2*i, "$r_"+str(i)+"$")
-    edge(nodeset[2*spacing, 9-2*i], nodeset[3*spacing, 0], weight=1, bend=-0.03 * (11-2*i))
+# for i in range(1,9):
+#     node(2*spacing, 9-2*i, "$r_"+str(i)+"$")
+#     edge(nodeset[2*spacing, 9-2*i], nodeset[3*spacing, 0], weight=1, bend=-0.03 * (11-2*i))
 
-for i in range(1,11):
-    for j in range(1,9):
-        if (i,j) in allowed:
-            edge(nodeset[spacing,11-2*i], nodeset[2*spacing, 9-2*j], weight=1, bend=0)
+# for i in range(1,11):
+#     for j in range(1,9):
+#         if (i,j) in allowed:
+#             edge(nodeset[spacing,11-2*i], nodeset[2*spacing, 9-2*j], weight=1, bend=0)
 
 
 
