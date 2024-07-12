@@ -506,7 +506,6 @@ karpbutt = newbutt("Edmonds"+ u"\u2010" +"Karp", 0.5, 0.1) # u"\u2010" is unicod
 def edmondskarp(graph, source, terminal):
 
     def augmentingpath(graph):
-
         resgraph = {v: [] for v in graph}
         for _,nbs in graph.items():
             for _,e in nbs:
@@ -772,7 +771,6 @@ but you can save it and then reload it as a new graph, then they are removeable.
 # for i in range(N):
 #     for j in range(i+1,N):
 #         edge(tenrings[i],tenrings[j],arrow=False)
-
 
 
 spacing = 7
