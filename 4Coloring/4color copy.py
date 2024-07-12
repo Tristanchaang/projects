@@ -8,7 +8,7 @@ import random,os
 bruteforceonly = False
 regionlimit = 20 # 10
 bordersize = 2 # 2
-mapname = "africa.jpg"
+mapname = ""
 
 def load_greyscale_image(filename):
     """
