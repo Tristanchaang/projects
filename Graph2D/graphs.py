@@ -8,7 +8,7 @@ from matplotlib.widgets import Button
 
 ########### Parameters ###########
 LaTeX = True # Activate only if your computer has LaTeX installed on PATH
-loadfilename = "edmonds" # name of saved graph, without .json
+loadfilename = "" # name of saved graph, without .json
 
 noderad = 0.6 # radius of the nodes, default 0.6
 textsize = 15 # size of labels, default 15
@@ -647,15 +647,15 @@ def process_input():
                         nb.remove(ve)
 
             if (coord0,coord1) in edgeset:
-                for e in edgeset[(coord0,coord1)]:
+                for e in edgeset[coord0,coord1]:
                     del e
 
-                del edgeset[(coord0,coord1)]
+                del edgeset[coord0,coord1]
 
             if (coord1, coord0) in edgeset:
-                edgeset[(coord1,coord0)] = [e for e in edgeset[(coord1,coord0)] if e.arrow]
+                edgeset[coord1,coord0] = [e for e in edgeset[coord1,coord0] if e.arrow]
 
-                if edgeset[(coord1,coord0)] == []: del edgeset[(coord1,coord0)]
+                if edgeset[coord1,coord0] == []: del edgeset[coord1,coord0]
 
             print("Deleted edge(s)")
 
