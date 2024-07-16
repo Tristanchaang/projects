@@ -94,6 +94,7 @@ ADDITIONAL COMMANDS:
 - und: Makes plotting edges undirected by default
 - dir: Makes plotting edges directed by default
 - zeroflow: Zeros all flows
+- pressing "esc": Empties input space and click queue, and removes all highlights
 '''
 
 ####################
