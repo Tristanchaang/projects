@@ -7,7 +7,7 @@ from matplotlib.widgets import Button
 
 ############ Parameters ############
 LaTeX = True # Activate only if your computer has LaTeX installed on PATH
-loadfilename = "rookproblem" # name of saved graph, without .json
+loadfilename = "flownetwork" # name of saved graph, without .json
 
 noderad = 0.6 # radius of the nodes, default 0.6
 textsize = 15 # size of labels, default 15
@@ -542,7 +542,7 @@ def dijkstra(graph, source):
 
 '''Edmonds-Karp'''
 
-karpbutt = newbutt("Edmonds"+ u"\u2010" +"Karp", 0.5, 0.1) # u"\u2010" is unicode for hyphen
+karpbutt = newbutt("Edmonds"+ u"\u2010" +"Karp", 0.45, 0.15) # u"\u2010" is unicode for hyphen
 
 @activatebutt(karpbutt,2)
 def edmondskarp(graph, source, terminal):
