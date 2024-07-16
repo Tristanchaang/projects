@@ -8,7 +8,7 @@ from matplotlib.widgets import Button
 
 ########### Parameters ###########
 LaTeX = True # Activate only if your computer has LaTeX installed on PATH
-loadfilename = "" # name of saved graph, without .json
+loadfilename = "k5" # name of saved graph, without .json
 
 noderad = 0.6 # radius of the nodes, default 0.6
 textsize = 15 # size of labels, default 15
@@ -161,6 +161,7 @@ class node:
                       x=self.coord[0],
                       y=self.coord[1] + 0.6 * noderad * (self.yrange[1]-self.yrange[0])/fig.get_figheight(),
                       c="red")
+        self.labeltext.set(color="red" if boo else "black")
 
     def lowlight(self, boo, write="", color="black"):
         self.mask.set(text=write if boo else "",
@@ -340,6 +341,9 @@ savebutt = newbutt("Save", 0.1, 0.1)
 
 def savegraph(_):
     global inputstatus
+
+    plt.savefig(relpath("saved_graphs/" + inputstatus))
+
     for_json = {
         "nodes": [],
         "edges": []
@@ -353,7 +357,7 @@ def savegraph(_):
     with open(relpath("saved_graphs/" + inputstatus + ".json"), "w") as f:
         json.dump(for_json,f)
 
-    print("Saved as " + inputstatus + ".json")
+    print("Saved as " + inputstatus + ".json and " + inputstatus + ".png")
     inputstatus = ""
     print('>>', inputstatus)
 
