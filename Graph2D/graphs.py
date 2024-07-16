@@ -811,14 +811,6 @@ but you can save it and then reload it as a new graph, then they are removeable.
 
 # margin = 3
 
-# for i in range(N):
-#     node(-int(R*math.sin(2*math.pi*i/N)),int(R*math.cos(2*math.pi*i/N)), str(i+1))
-
-# for i in range(N):
-#     for j in range(i+1,N):
-#         edge(tenrings[i],tenrings[j],arrow=False)
-
-
 # spacing = 7
 
 # allowed = {(1,1),(1,3),(1,6),
