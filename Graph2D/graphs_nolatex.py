@@ -350,7 +350,7 @@ def savegraph(_):
         for e in es:
             for_json["edges"].append((e.start.coord, e.end.coord, e.weight, e.bend, e.arrow, e.flowvalue))
 
-    with open(relpath("saved_graphs/" + inputstatus + ".json"), "w") as f:
+    with open(relpath("saved_graphs/json_files/" + inputstatus + ".json"), "w") as f:
         json.dump(for_json,f)
 
     print("Saved as " + inputstatus + ".json")
@@ -360,7 +360,7 @@ def savegraph(_):
 savebutt.on_clicked(savegraph)
 
 def loadgraph(jsonname):
-    with open(relpath("saved_graphs/" + jsonname + ".json"), "r") as f:
+    with open(relpath("saved_graphs/json_files/" + jsonname + ".json"), "r") as f:
         file = json.load(f)
     for n in file["nodes"]:
         node(*n)

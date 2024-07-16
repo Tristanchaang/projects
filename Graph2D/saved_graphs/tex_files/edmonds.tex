@@ -1,0 +1,22 @@
+\begin{tikzpicture}[->, thick, main/.style = {circle,draw, inner sep = 0pt, minimum size = 0.6cm}, edge/.style = {circle, midway, fill=white, inner sep=0pt, minimum size=0.4cm}, scale = 0.5]    \node[main] (s) at (0, -1) {$s$};
+    \node[main] (a) at (-1, 1) {$a$};
+    \node[main] (d) at (-1, 0) {$d$};
+    \node[main] (t) at (-2, 2) {$t$};
+    \node[main] (f) at (-3, 1) {$f$};
+    \node[main] (e) at (-3, 0) {$e$};
+    \node[main] (c) at (0, 2) {$c$};
+    \node[main] (b) at (1, 1) {$b$};
+    \node[main] (g) at (1, 0) {$g$};
+    \path
+        (f) edge[bend right = 0] node[edge] {2} (t)
+        (d) edge[bend right = 0] node[edge] {2} (e)
+        (e) edge[bend right = 0] node[edge] {4} (f)
+        (s) edge[bend right = 0] node[edge] {3} (d)
+        (d) edge[bend right = 0] node[edge] {3} (a)
+        (a) edge[bend right = 0] node[edge] {3} (t)
+        (c) edge[bend right = 0] node[edge] {3} (a)
+        (b) edge[bend right = 0] node[edge] {4} (a)
+        (b) edge[bend right = 0] node[edge] {3} (c)
+        (s) edge[bend right = 0] node[edge] {3} (g)
+        (g) edge[bend right = 0] node[edge] {3} (b);
+\end{tikzpicture}

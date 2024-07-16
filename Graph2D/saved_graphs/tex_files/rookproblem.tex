@@ -1,0 +1,61 @@
+\begin{tikzpicture}[->, thick, main/.style = {circle,draw, inner sep = 0pt, minimum size = 0.6cm}, edge/.style = {circle, midway, fill=white, inner sep=0pt, minimum size=0.4cm}, scale = 0.5]    \node[main] (s) at (0, 0) {$s$};
+    \node[main] (t) at (21, 0) {$t$};
+    \node[main] (c_{1}) at (7, 9) {$c_{1}$};
+    \node[main] (c_{2}) at (7, 7) {$c_{2}$};
+    \node[main] (c_{3}) at (7, 5) {$c_{3}$};
+    \node[main] (c_{4}) at (7, 3) {$c_{4}$};
+    \node[main] (c_{5}) at (7, 1) {$c_{5}$};
+    \node[main] (c_{6}) at (7, -1) {$c_{6}$};
+    \node[main] (c_{7}) at (7, -3) {$c_{7}$};
+    \node[main] (c_{8}) at (7, -5) {$c_{8}$};
+    \node[main] (c_{9}) at (7, -7) {$c_{9}$};
+    \node[main] (c_{10}) at (7, -9) {$c_{10}$};
+    \node[main] (r_1) at (14, 7) {$r_1$};
+    \node[main] (r_2) at (14, 5) {$r_2$};
+    \node[main] (r_3) at (14, 3) {$r_3$};
+    \node[main] (r_4) at (14, 1) {$r_4$};
+    \node[main] (r_5) at (14, -1) {$r_5$};
+    \node[main] (r_6) at (14, -3) {$r_6$};
+    \node[main] (r_7) at (14, -5) {$r_7$};
+    \node[main] (r_8) at (14, -7) {$r_8$};
+    \path
+        (s) edge[bend right = -27.0] node[edge] {1} (c_{1})
+        (s) edge[bend right = -21.0] node[edge] {1} (c_{2})
+        (s) edge[bend right = -15.0] node[edge] {1} (c_{3})
+        (s) edge[bend right = -9.0] node[edge] {1} (c_{4})
+        (s) edge[bend right = -3.0] node[edge] {1} (c_{5})
+        (s) edge[bend right = 3.0] node[edge] {1} (c_{6})
+        (s) edge[bend right = 9.0] node[edge] {1} (c_{7})
+        (s) edge[bend right = 15.0] node[edge] {1} (c_{8})
+        (s) edge[bend right = 21.0] node[edge] {1} (c_{9})
+        (s) edge[bend right = 27.0] node[edge] {1} (c_{10})
+        (r_1) edge[bend right = -27.0] node[edge] {1} (t)
+        (r_2) edge[bend right = -21.0] node[edge] {1} (t)
+        (r_3) edge[bend right = -15.0] node[edge] {1} (t)
+        (r_4) edge[bend right = -9.0] node[edge] {1} (t)
+        (r_5) edge[bend right = -3.0] node[edge] {1} (t)
+        (r_6) edge[bend right = 3.0] node[edge] {1} (t)
+        (r_7) edge[bend right = 9.0] node[edge] {1} (t)
+        (r_8) edge[bend right = 15.0] node[edge] {1} (t)
+        (c_{1}) edge[bend right = 0] node[edge] {1} (r_1)
+        (c_{1}) edge[bend right = 0] node[edge] {1} (r_3)
+        (c_{1}) edge[bend right = 0] node[edge] {1} (r_6)
+        (c_{2}) edge[bend right = 0] node[edge] {1} (r_1)
+        (c_{2}) edge[bend right = 0] node[edge] {1} (r_7)
+        (c_{3}) edge[bend right = 0] node[edge] {1} (r_1)
+        (c_{3}) edge[bend right = 0] node[edge] {1} (r_2)
+        (c_{3}) edge[bend right = 0] node[edge] {1} (r_5)
+        (c_{4}) edge[bend right = 0] node[edge] {1} (r_6)
+        (c_{5}) edge[bend right = 0] node[edge] {1} (r_4)
+        (c_{5}) edge[bend right = 0] node[edge] {1} (r_7)
+        (c_{6}) edge[bend right = 0] node[edge] {1} (r_1)
+        (c_{6}) edge[bend right = 0] node[edge] {1} (r_2)
+        (c_{6}) edge[bend right = 0] node[edge] {1} (r_8)
+        (c_{7}) edge[bend right = 0] node[edge] {1} (r_4)
+        (c_{8}) edge[bend right = 0] node[edge] {1} (r_4)
+        (c_{8}) edge[bend right = 0] node[edge] {1} (r_6)
+        (c_{9}) edge[bend right = 0] node[edge] {1} (r_1)
+        (c_{9}) edge[bend right = 0] node[edge] {1} (r_3)
+        (c_{10}) edge[bend right = 0] node[edge] {1} (r_7)
+        (c_{3}) edge[bend right = 0] node[edge] {1} (r_8);
+\end{tikzpicture}

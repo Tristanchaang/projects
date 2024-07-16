@@ -231,8 +231,7 @@ class edge:
 
     def changeflow(self, newvalue):
         self.flowvalue = newvalue
-        self.labeltext.set(text=("" if self.flowvalue==0 else (str(self.flowvalue)+"/")) +
-                            texify(self.weight))
+        self.labeltext.set(text=flowcapacity(self.flowvalue, self.weight))
 
     def showweight(self, boo):
         if self.labelbg is not None: self.labelbg.set_visible(boo)
@@ -266,6 +265,8 @@ def texify(number):
     else:
         return str(number)
 
+def flowcapacity(f,c):
+    return ("" if f==0 else (str(f)+"/")) + texify(c)
 
 def arrow_(p,q,weight,bend,arrow, flow):
     '''draws arrow'''
@@ -286,7 +287,7 @@ def arrow_(p,q,weight,bend,arrow, flow):
         labelbg = ax.scatter([x3],[y3], s=noderad*400, ec="none", color="white", linewidth=thickness,zorder=0)
     else: labelbg = None
 
-    labeltext = ax.text(x3,y3,s=("" if flow==0 else (str(flow)+"/")) + texify(weight),
+    labeltext = ax.text(x3,y3,s=flowcapacity(flow, weight),
                          horizontalalignment='center',verticalalignment='center', size=textsize)
 
     return shape, labeltext, labelbg
@@ -342,8 +343,10 @@ savebutt = newbutt("Save", 0.1, 0.1)
 def savegraph(_):
     global inputstatus
 
-    plt.savefig(relpath("saved_graphs/" + inputstatus))
+    # save PNG
+    plt.savefig(relpath("saved_graphs/png_files/" + inputstatus))
 
+    # save json
     for_json = {
         "nodes": [],
         "edges": []
@@ -354,17 +357,31 @@ def savegraph(_):
         for e in es:
             for_json["edges"].append((e.start.coord, e.end.coord, e.weight, e.bend, e.arrow, e.flowvalue))
 
-    with open(relpath("saved_graphs/" + inputstatus + ".json"), "w") as f:
+    with open(relpath("saved_graphs/json_files/" + inputstatus + ".json"), "w") as f:
         json.dump(for_json,f)
 
-    print("Saved as " + inputstatus + ".json and " + inputstatus + ".png")
+    # save TeX file
+    start = "\\begin{tikzpicture}[->, thick, main/.style = {circle,draw, inner sep = 0pt, minimum size = 0.6cm}, edge/.style = {circle, midway, fill=white, inner sep=0pt, minimum size=0.4cm}, scale = 0.5]"
+    nodedef = ""
+    for _,n in nodeset.items():
+        nodedef += f"    \\node[main] ({n.label[1:-1]}) at {n.coord} {{{n.label}}};\n"
+    edgedef = ""
+    for _,es in edgeset.items():
+        for e in es:
+            edgedef += f"        ({e.start.label[1:-1]}) edge[bend right = {e.bend * 100}] node[edge] {{{flowcapacity(e.flowvalue, e.weight)}}} ({e.end.label[1:-1]})\n"
+    ending = ";\n\\end{tikzpicture}"
+    with open(relpath("saved_graphs/tex_files/" + inputstatus + ".tex"), "w") as f:
+        f.write(start + nodedef + "    \\path\n" + edgedef[:-1] + ending)
+
+    # announce done
+    print("Saved as " + inputstatus + ".json, " + inputstatus + ".png, and " + inputstatus + ".tex")
     inputstatus = ""
     print('>>', inputstatus)
 
 savebutt.on_clicked(savegraph)
 
 def loadgraph(jsonname):
-    with open(relpath("saved_graphs/" + jsonname + ".json"), "r") as f:
+    with open(relpath("saved_graphs/json_files/" + jsonname + ".json"), "r") as f:
         file = json.load(f)
     for n in file["nodes"]:
         node(*n)
