@@ -6,7 +6,7 @@ import matplotlib.patches as mp
 from matplotlib import colors
 from matplotlib.widgets import Button
 
-########### Parameters ###########
+############ Parameters ############
 LaTeX = True # Activate only if your computer has LaTeX installed on PATH
 loadfilename = "k5" # name of saved graph, without .json
 
@@ -17,7 +17,7 @@ velocityscale = 0.01 # speed of flow dots, default 0.01
 thickness = 1 # thickness of lines, default 1
 nodebg = "white" # node color, default "white"
 H, W = 6, 12 # window dimensions
-##################################
+####################################
 
 '''
 Guide!!! :D
