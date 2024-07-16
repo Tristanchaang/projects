@@ -73,7 +73,7 @@ TOGGLING FLOW:
 SAVE GRAPH:
 - Type a valid name (e.g. flownetwork), then click the Save Button.
 ** Note **
-    (1) They will be saved into a folder called saved_graphs.
+    (1) The graph will be saved into a folder called saved_graphs.
     (2) This folder is created once you run this program for the first time!
     (3) Each saved graph comes in the form of a json, png, and a tex file.
         (3a) The json file is for loading the graph once again
@@ -370,17 +370,17 @@ def savegraph(_):
         json.dump(for_json,f)
 
     # save TeX file
-    start = "\\begin{tikzpicture}[->, thick, main/.style = {circle,draw, inner sep = 0pt, minimum size = 0.6cm}, edge/.style = {circle, midway, fill=white, inner sep=0pt, minimum size=0.4cm}, scale = 0.5]"
+    start = "\\begin{tikzpicture}[->, thick, main/.style = {circle,draw, inner sep = 0pt, minimum size = 0.6cm}, edge/.style = {circle, midway, fill=white, inner sep=0pt, minimum size=0.4cm}, scale = 0.5]\n\n"
     nodedef = ""
     for _,n in nodeset.items():
         nodedef += f"    \\node[main] ({n.label[1:-1]}) at {n.coord} {{{n.label}}};\n"
     edgedef = ""
     for _,es in edgeset.items():
         for e in es:
-            edgedef += f"        ({e.start.label[1:-1]}) edge[bend right = {e.bend * 100}] node[edge] {{{flowcapacity(e.flowvalue, e.weight)}}} ({e.end.label[1:-1]})\n"
+            edgedef += f"        ({e.start.label[1:-1]}) edge[bend right = {e.bend * 100}] " + (f"node[edge] {{{flowcapacity(e.flowvalue, e.weight)}}}" if e.weight else "") + f" ({e.end.label[1:-1]})\n"
     ending = ";\n\\end{tikzpicture}"
     with open(relpath("saved_graphs/tex_files/" + inputstatus + ".tex"), "w") as f:
-        f.write(start + nodedef + "    \\path\n" + edgedef[:-1] + ending)
+        f.write(start + nodedef + "\n    \\path\n" + edgedef[:-1] + ending)
 
     # announce done
     print("Saved as " + inputstatus + ".json, " + inputstatus + ".png, and " + inputstatus + ".tex")

@@ -1,32 +1,35 @@
-\begin{tikzpicture}[->, thick, main/.style = {circle,draw, inner sep = 0pt, minimum size = 0.6cm}, edge/.style = {circle, midway, fill=white, inner sep=0pt, minimum size=0.4cm}, scale = 0.5]    \node[main] () at (0, 10) {1};
-    \node[main] () at (-8, -4) {6};
-    \node[main] () at (11, -4) {4};
-    \node[main] () at (11, -8) {5};
-    \node[main] () at (12, 1) {12};
-    \node[main] () at (8, -11) {11};
-    \node[main] () at (3, -13) {14};
-    \node[main] () at (-3, -14) {2};
-    \node[main] () at (-8, -12) {7};
-    \node[main] () at (-12, -9) {9};
-    \node[main] () at (-13, 0) {10};
-    \node[main] () at (-12, 10) {15};
-    \node[main] () at (-1, 1) {3};
-    \node[main] () at (9, 12) {8};
-    \node[main] () at (5, 3) {13};
+\begin{tikzpicture}[->, thick, main/.style = {circle,draw, inner sep = 0pt, minimum size = 0.6cm}, edge/.style = {circle, midway, fill=white, inner sep=0pt, minimum size=0.4cm}, scale = 0.5]
+
+    \node[main] (1) at (0, 10) {$1$};
+    \node[main] (6) at (-8, -4) {$6$};
+    \node[main] (4) at (11, -4) {$4$};
+    \node[main] (5) at (11, -8) {$5$};
+    \node[main] (12) at (12, 1) {$12$};
+    \node[main] (11) at (8, -11) {$11$};
+    \node[main] (14) at (3, -13) {$14$};
+    \node[main] (2) at (-3, -14) {$2$};
+    \node[main] (7) at (-8, -12) {$7$};
+    \node[main] (9) at (-12, -9) {$9$};
+    \node[main] (10) at (-13, 0) {$10$};
+    \node[main] (15) at (-12, 10) {$15$};
+    \node[main] (3) at (-1, 1) {$3$};
+    \node[main] (8) at (9, 12) {$8$};
+    \node[main] (13) at (5, 3) {$13$};
+
     \path
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ()
-        () edge[bend right = 0] node[edge] {} ();
+        (4) edge[bend right = 0]  (5)
+        (4) edge[bend right = 0]  (12)
+        (5) edge[bend right = 0]  (11)
+        (14) edge[bend right = 0]  (11)
+        (2) edge[bend right = 0]  (14)
+        (2) edge[bend right = 0]  (7)
+        (7) edge[bend right = 0]  (9)
+        (6) edge[bend right = 0]  (10)
+        (15) edge[bend right = 0]  (1)
+        (15) edge[bend right = 0]  (10)
+        (1) edge[bend right = 0]  (3)
+        (3) edge[bend right = 0]  (6)
+        (1) edge[bend right = 0]  (8)
+        (13) edge[bend right = 0]  (12)
+        (3) edge[bend right = 0]  (13);
 \end{tikzpicture}
