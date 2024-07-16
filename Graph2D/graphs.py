@@ -831,4 +831,3 @@ reshape_diagram()
 
 plt.show()
 fig.show()
-# ani.save(filename="graph.gif", writer="pillow")
