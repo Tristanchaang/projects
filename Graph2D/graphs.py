@@ -3,7 +3,6 @@ import math, json, os
 import matplotlib.pyplot as plt
 import matplotlib.animation as anime
 import matplotlib.patches as mp
-from matplotlib import colors
 from matplotlib.widgets import Button
 
 ############ Parameters ############
@@ -76,6 +75,10 @@ SAVE GRAPH:
 ** Note **
     (1) They will be saved into a folder called saved_graphs.
     (2) This folder is created once you run this program for the first time!
+    (3) Each saved graph comes in the form of a json, png, and a tex file.
+        (3a) The json file is for loading the graph once again
+        (3b) The png file is for easy reference
+        (3c) The tex file is a LaTeX tikzpicture code to draw the saved graph
 
 RUNNING A BFS/DFS/Dijkstra:
 - Click the source node, then click BFS/DFS/Dijkstra. The source node should be highlighted.
@@ -100,9 +103,15 @@ ADDITIONAL COMMANDS:
 cur_dir = os.path.dirname(__file__) # directory of this file
 relpath = lambda x: os.path.join(cur_dir, x)
 
-# create folder if absent
+# create folders if absent
 if not os.path.exists(relpath('saved_graphs')):
     os.makedirs(relpath('saved_graphs'))
+if not os.path.exists(relpath('saved_graphs/json_files')):
+    os.makedirs(relpath('saved_graphs/json_files'))
+if not os.path.exists(relpath('saved_graphs/png_files')):
+    os.makedirs(relpath('saved_graphs/png_files'))
+if not os.path.exists(relpath('saved_graphs/tex_files')):
+    os.makedirs(relpath('saved_graphs/tex_files'))
 
 # font setting
 plt.rcParams.update({
