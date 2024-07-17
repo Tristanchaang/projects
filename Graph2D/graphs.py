@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as anime
 import matplotlib.patches as mp
 from matplotlib.widgets import Button
-import matplotlib.axes as axes
 
 ############ Parameters ############
 LaTeX = True # Activate only if your computer has LaTeX installed on PATH
