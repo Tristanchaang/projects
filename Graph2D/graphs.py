@@ -6,7 +6,7 @@ import matplotlib.patches as mp
 from matplotlib.widgets import Button
 
 ############ Parameters ############
-LaTeX = True # Activate only if your computer has LaTeX installed on PATH
+LaTeX = False # Activate only if your computer has LaTeX installed on PATH
 loadfilename = "flownetwork" # name of saved graph, without .json
 
 noderad = 0.6 # radius of the nodes, default 0.6
@@ -848,4 +848,3 @@ but you can save it and then reload it as a new graph, then they are removeable.
 reshape_diagram()
 
 plt.show()
-fig.show()
