@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as anime
 import matplotlib.patches as mp
 from matplotlib.widgets import Button
+import matplotlib.axes as axes
 
 ############ Parameters ############
 LaTeX = True # Activate only if your computer has LaTeX installed on PATH
@@ -265,7 +266,6 @@ def bent_midpoint(coord1, coord2, bend):
     x2,y2 = coord2
     disp = np.array([[0,1],[-1,0]]) @ np.array([[x2-x1],[y2-y1]]) * bend * 0.5
     return list((disp+np.array([[(x1+x2)/2],[(y1+y2)/2]])).flatten())
-
 
 def texify(number):
     if number == float("inf"):
