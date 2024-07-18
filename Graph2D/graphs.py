@@ -6,8 +6,9 @@ import matplotlib.patches as mp
 from matplotlib.widgets import Button
 
 ############ Parameters ############
-LaTeX = False # Activate only if your computer has LaTeX installed on PATH
-loadfilename = "flownetwork" # name of saved graph, without .json
+LaTeX = True # Activate only if your computer has LaTeX installed on PATH
+loadfilename = "" # name of saved graph, without .json
+
 
 noderad = 0.6 # radius of the nodes, default 0.6
 textsize = 15 # size of labels, default 15
