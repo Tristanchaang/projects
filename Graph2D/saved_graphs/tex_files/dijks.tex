@@ -1,4 +1,6 @@
-\begin{tikzpicture}[->, thick, main/.style = {circle,draw, inner sep = 0pt, minimum size = 0.6cm}, edge/.style = {circle, midway, fill=white, inner sep=0pt, minimum size=0.4cm}, scale = 0.5]    \node[main] (s) at (0, 0) {$s$};
+\begin{tikzpicture}[->, thick, main/.style = {circle,draw, inner sep = 0pt, minimum size = 0.6cm}, edge/.style = {circle, midway, fill=white, inner sep=0pt, minimum size=0.4cm}, scale = 0.5]
+
+    \node[main] (s) at (0, 0) {$s$};
     \node[main] (a) at (2, 2) {$a$};
     \node[main] (b) at (2, -2) {$b$};
     \node[main] (c) at (4, 2) {$c$};
@@ -7,6 +9,7 @@
     \node[main] (f) at (6, 2) {$f$};
     \node[main] (g) at (6, -2) {$g$};
     \node[main] (t) at (8, 0) {$t$};
+
     \path
         (s) edge[bend right = 0] node[edge] {4} (a)
         (s) edge[bend right = 0] node[edge] {8} (b)

@@ -7,7 +7,7 @@ from matplotlib.widgets import Button
 
 ############ Parameters ############
 LaTeX = True # Activate only if your computer has LaTeX installed on PATH
-loadfilename = "" # name of saved graph, without .json
+loadfilename = "dijks" # name of saved graph, without .json
 
 
 noderad = 0.6 # radius of the nodes, default 0.6
