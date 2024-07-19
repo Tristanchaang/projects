@@ -1,5 +1,5 @@
 import numpy as np
-import math, json, os
+import math, json, os, sys
 import matplotlib.pyplot as plt
 import matplotlib.animation as anime
 import matplotlib.patches as mp
@@ -26,6 +26,8 @@ You will be able to save a graph after you plot it.
 (recommend to frequently do so because matplotlib often crashes).
 If you want to load a saved graph file (e.g. flownetwork.json),
 put "flownetwork" into the loadfilename line above.
+** Note ** 
+    Another way to load a file is to enter "python3 (or python) graphs.py [filename]" on cmd line.
 
 When the figure is run, a live terminal will be running in the background.
 It will keep track the different inputs you type in or click on.
@@ -101,6 +103,10 @@ ADDITIONAL COMMANDS:
 ####################
 # CODE STARTS HERE #
 ####################
+
+cmdlineinput = sys.argv
+if len(cmdlineinput)==2:
+    loadfilename = cmdlineinput[1]
 
 cur_dir = os.path.dirname(__file__) # directory of this file
 relpath = lambda x: os.path.join(cur_dir, x)
