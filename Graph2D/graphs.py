@@ -9,7 +9,6 @@ from matplotlib.widgets import Button
 LaTeX = True # Activate only if your computer has LaTeX installed on PATH
 loadfilename = "edmonds" # name of saved graph, without .json
 
-
 noderad = 0.6 # radius of the nodes, default 0.6
 textsize = 15 # size of labels, default 15
 margin = 2 # amount of white space from border, default 2
