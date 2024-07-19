@@ -26,7 +26,7 @@ You will be able to save a graph after you plot it.
 If you want to load a saved graph file (e.g. flownetwork.json),
 put "flownetwork" into the loadfilename line above.
 ** Note ** 
-    Another way to load a file is to enter "python3 (or python) graphs.py [filename]" on cmd line.
+    Another way to load a file is to enter "python3 (or python) Graph2D.py [filename]" on cmd line.
 
 When the figure is run, a live terminal will be running in the background.
 It will keep track the different inputs you type in or click on.
