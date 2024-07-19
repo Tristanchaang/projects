@@ -104,7 +104,7 @@ ADDITIONAL COMMANDS:
 ####################
 
 cmdlineinput = sys.argv
-if len(cmdlineinput)==2:
+if len(cmdlineinput)==2: # allows "python3 Graph2D.py filename" cmd line.
     loadfilename = cmdlineinput[1]
 
 cur_dir = os.path.dirname(__file__) # directory of this file
