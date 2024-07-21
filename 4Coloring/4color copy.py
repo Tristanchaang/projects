@@ -8,7 +8,7 @@ import random,os
 bruteforceonly = False
 regionlimit = 20 # 10
 bordersize = 2 # 2
-mapname = "msia.jpeg"
+mapname = "africa.jpg"
 
 def load_greyscale_image(filename):
     """
@@ -204,7 +204,7 @@ if True:
                 ax2.set_yticks([])
                 ax2.imshow(converter(last), interpolation='nearest', cmap=cmap, norm =norm) 
             
-        plt.pause(0.01)
+        plt.pause(0.3)
         ax1.cla()
         if not bruteforceonly: ax2.cla()
 
